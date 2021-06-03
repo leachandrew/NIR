@@ -14,8 +14,8 @@ Canada has a long road ahead, especially with the new Glasgow target.
 
 Canada's emissions inventory by province shows where emissions have increased and why different provinces may feel more of a threat from climate change policies.
 
-<a href="images/inventory_only.png" target="_blank">
-  <img border="0" align="center"  src="images/inventory_only.png"/>
+<a href="images/inventory_provs.png" target="_blank">
+  <img border="0" align="center"  src="images/inventory_provs.png"/>
 </a>
 
 
