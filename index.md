@@ -24,4 +24,8 @@ Canada's emissions inventory by IPCC sector and province reveals some other info
 ![](images/inventory_ipcc_sector.png)
 
 
-![Here's one example](images/index_provs.png)
+
+<a href="http://www.google.com" target="_blank">
+  <img width="220" height="250" border="0" align="center"  src="images/inventory_ipcc_sector.png"/>
+</a>
+
