@@ -8,10 +8,10 @@ author: Andrew Leach
 theme: jekyll-theme-cayman
 
 
-#plugins:
-#  - jekyll-remote-theme
+plugins:
+  - jekyll-remote-theme
   
-#remote_theme: daattali/beautiful-jekyll
+remote_theme: daattali/beautiful-jekyll
 
 navbar-links:
   National Emissions and Target: "canada"
