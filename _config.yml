@@ -19,6 +19,7 @@ navbar-links:
   IPCC Sectors: "ipcc_sectors"
   Projections: "projections"
   Alberta: "alberta"
+  Github Repo: "https://github.com/leachandrew/NIR"
 
 # --- Logo --- #
 
