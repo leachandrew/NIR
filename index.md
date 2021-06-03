@@ -19,7 +19,9 @@ Slicing canada's emissions inventory by econmomic sector and province shows a su
 
 ![](images/inventory_sector.png)
 
-
 Canada's emissions inventory by IPCC sector and province reveals some other information about point vs non-point sources and, in this case, the small role of things like aviation.
 
 ![](images/inventory_ipcc_sector.png)
+
+
+![Here's one example](images/index_provs.png)
