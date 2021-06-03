@@ -1,37 +1,7 @@
-## Welcome to GitHub Pages
+## Canada's National Inventory Report
 
-You can use the [editor on GitHub](https://github.com/leachandrew/NIR/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+Each year, Canada and all other signatories to the United Nations Framework Convention on Climate Change submit [annual National Inventory Reports (NIRs)](https://unfccc.int/ghg-inventories-annex-i-parties/2021) which track annual GHG emissions within their countries.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+I'm frequently asked for copies of some of the graphs I make for Canada's submissions, so I am in the process of adding them all here, and you are free to use them under the Creative Commons License Conditions.
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/leachandrew/NIR/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+![Here's one example](images/index_provs.png)
