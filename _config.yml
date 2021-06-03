@@ -1,10 +1,13 @@
 # Name of website
-title: Canada's National Greenhouse Gas Emissions Inventory Report (NIR) and projections
-subtitle: Graphs using Canada's NIR and emissions projections
+title:  |
+    | title 
+    | subtitle
+#Canada's National Greenhouse Gas Emissions Inventory Report (NIR) and<br>Environment and Climate Change Canada Emissions Projections
+#subtitle: Graphs using Canada's NIR and emissions projections
 # Your name to show in the footer
 author: Andrew Leach
 
-theme: jekyll-theme-cayman
+#theme: jekyll-theme-cayman
 
 
 plugins:
