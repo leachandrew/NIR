@@ -63,7 +63,7 @@ get_new_nir<-function() {
                                NULL)%>%
     mutate(sector=factor(sector),
           sector=fct_collapse(sector,"Inventory Total"=
-                c("Territories Inventory Total","Territory Inventory Total","Provincial Inventory Total"))
+                c("Territorial Inventory Total","National Inventory Total","Territories Inventory Total","Territory Inventory Total","Provincial Inventory Total"))
            )%>%
     group_by(Year, Prov,sector) %>% summarize(GHGs=sum(as.numeric(CO2eq),na.rm = T)) %>% ungroup()%>%
     select(sector,Prov,Year,GHGs)%>%#filter(!is.na(GHGs))%>%
@@ -72,8 +72,7 @@ get_new_nir<-function() {
                                  "Oil Sands" = c("Oil Sands","Oil Sands (Mining, In-situ, Upgrading)"),
             "Oil Sands In Situ" = c("In-situ","Bitumen In Situ","In-situ Bitumen"),
             "Oil Sands Mining" = c("Mining and Extraction","Bitumen Mining","Oil Sands Mining and Extraction"),
-              "Oil Sands Upgrading" = c("Upgrading","Bitumen Upgrading"),
-              "Total, Canada" = c("Total","GHG TOTAL","National Inventory Total")))
+              "Oil Sands Upgrading" = c("Upgrading","Bitumen Upgrading")))
 
   
     
