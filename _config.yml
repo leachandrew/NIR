@@ -13,20 +13,13 @@ theme: jekyll-theme-cayman
   
 #remote_theme: daattali/beautiful-jekyll
 
-#navbar-links:
-#  Projections: "projection"
-#  By Age: "ageplots"
-#  Alberta: "alberta"
-#  Comparisons:
-#    - Provinces: "provs"
-#    - USA: "usa"
-#    - OECD: "oecd"
-#    - World: "international"
-#    - Projections: "int_proj"
-#    - Total Doses: "int_proj_total"
-#  Needlessly Fancy: "needless"
-#  COVID Cases: "cases"
-#  Author's Home: "https://www.trevortombe.com"
+navbar-links:
+  National Emissions and Target: "canada"
+  Provinces: "provinces"
+  Economic Sectors: "econ"
+  IPCC Sectors: "ipcc"
+  Projections: "projection"
+  Alberta: "alberta"
 
 # --- Logo --- #
 
