@@ -16,8 +16,8 @@ remote_theme: daattali/beautiful-jekyll
 navbar-links:
   National Emissions and Target: "canada"
   Provinces: "provinces"
-  Economic Sectors: "econ"
-  IPCC Sectors: "ipcc"
+  Economic Sectors: "econ_sectors"
+  IPCC Sectors: "ipcc_sectors"
   Projections: "projection"
   Alberta: "alberta"
 
@@ -68,11 +68,11 @@ feed_show_excerpt: true
 feed_show_tags: true
 
 # Personalize the colours in your website. Colour values can be any valid CSS colour
-#navbar-col: "#396ab1"
-#navbar-text-col: "#FFFFFF"
-#navbar-border-col: "#396ab1"
-#page-col: "#FFFFFF"
-#text-col: "#404040"
+navbar-col: "#007C41"
+navbar-text-col: "#FFFFFF"
+navbar-border-col: "#FFDB05"
+page-col: "#FFFFFF"
+text-col: "#000000"
 #link-col: "#396ab1"
 #hover-col: "#CC2529"
 #footer-col: "#EAEAEA"
