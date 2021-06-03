@@ -73,10 +73,11 @@ navbar-border-col: "#FFDB05"
 page-col: "#FFFFFF"
 text-col: "#000000"
 link-col: "#7D9AAA"
-hover-col: "#CC2529"
-footer-col: "#CC2529"
+hover-col: "#7D9AAA"
+footer-col: "#007C41"
 footer-text-col: "#FFFFFF"
 footer-link-col: "#FFDB05"
+footer-link-hover-col: "#FFDB05"
 
 # Ruby Date Format to show dates of posts
 date_format: "%B %d, %Y"
