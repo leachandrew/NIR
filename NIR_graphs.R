@@ -1063,7 +1063,6 @@ cdn_data$kyoto[(cdn_data$Year>=2008 &cdn_data$Year<=2012)]<-565
 cdn_data<-left_join(cdn_data,progress_annex_table,by=c("Year","sector"))
 
 
-#started here
 
 #ECCC Targets data
 targets_csv<-"https://www.canada.ca/content/dam/eccc/documents/csv/cesindicators/progress-canada-ghg-emissions-reduction-target/2019/progress-towards-canada-ghg-emissions-target-en.csv"
@@ -1146,7 +1145,7 @@ targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(s
            colour=palette[9],fontface="bold",hjust=1)+
   #glasgow
   #geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
-  geom_errorbar(aes(x=2030,ymax=443,ymin=406.3),width=1..4,size=2,colour=palette[9])+
+  geom_errorbar(aes(x=2030,ymax=443,ymin=406.3),width=1.4,size=2,colour=palette[9])+
   annotate("text",x=2029,y=423,label="Glasgow Target (40-45% below 2005 levels by 2030)",
            colour=palette[9],fontface="bold",hjust=1)+
   #2050
@@ -1179,7 +1178,7 @@ ggsave("images/emissions_and_targets_proj.png",dpi=300,width=13,height=6)
 targets_graph+ annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2020-2030)",color="black",fontface="bold",hjust=0)+
   geom_line(data=filter(NIR_natl,sector=="Oil and Gas"),aes(Year,GHGs),color=palette[4],size=2)+
   geom_line(data=filter(proj_data,sector=="Oil and Gas",scenario=="2020 Reference Case",prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="dotted")+
-  annotate("text",x=1995,y=300,label="Inventory (1990-2019) and projected (2020-2030) emissions from oil and gas",
+  annotate("text",x=1992,y=300,label="Inventory (1990-2019) and projected (2020-2030) emissions from oil and gas",
   color=palette[4],fontface="bold",hjust=0)
 ggsave("images/emissions_and_targets_oil.png",dpi=300,width=13,height=6)
 
