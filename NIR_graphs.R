@@ -86,7 +86,6 @@ get_gdp_data()
 load(file = "data/gdp_data.Rdata")
 
 
-
 #create provincial data file
 NIR_data<-filter(new_nir,Prov!="Canada")%>% mutate(Year=as.numeric(Year))
 #section out a sample of provincial totals (used later)
@@ -450,6 +449,7 @@ ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
        caption="Source: Environment Canada National Inventory Data, graph by @andrew_leach")
 ggsave("images/natl_per_cap.png",height = 9,width = 16,dpi=300)
 
+
 #find the largest sectors
 
 major_sectors<-NIR_natl %>% group_by(sector) %>% summarize(max_ghg=max(GHGs)) %>% arrange(-max_ghg) %>% head(6) %>% select(sector)
@@ -463,10 +463,6 @@ large_sec<-NIR_data %>% filter(sector %in% main_sectors,sector!="National Invent
 large_sec<-large_sec%>%left_join(prov_samp,by=c("Prov","Year"))%>% left_join(pop_data%>%mutate(Year=as.numeric(Year)),by=c("Prov"="Code","Year"))
 
 #sub_samp$Prov<-fct_rev(sub_samp$Prov)
-
-
-
-
 
 #sub_samp<-merge(sub_samp,power_data_exp,by.x=c("Prov","Year"),by.y=c("Code","Year"))
 
@@ -561,754 +557,6 @@ ggplot(filter(large_sec,Prov!="TERR"),group=as.numeric(as.character(Year)))+
 ggsave("images/inventory_shares.png",width=16,height=9,dpi=600)
 
 
-
-df1<-large_sec
-
-df1<-df1 %>% group_by(sector,Prov_GHGs,Prov_pop) %>% mutate(sector_GHGs=sum(GHGs))
-#sort levels by sector GHGs
-df1$sector<-fct_reorder(df1$sector,-df1$sector_GHGs)
-#Keep top 6
-df1$sector<-fct_other(df1$sector,keep = levels(df1$sector)[1:7],  other_level = "Other")
-
-df1<-df1 %>% group_by(sector,Prov,Year) %>% summarise(GHGs=sum(GHGs),Prov_GHGs=sum(Prov_GHGs),Prov_Pop=sum(Prov_pop))
-df1$Prov<-fct_rev(df1$Prov)
-df1$sector<-fct_relevel(df1$sector,"Oil and Gas")
-df1$sector<-fct_relevel(df1$sector,"Agriculture",after = 5)
-
-ggplot(filter(df1,Prov!="TERR"),group=as.numeric(as.character(Year)))+
-  geom_area(aes(as.numeric(as.character(Year)),GHGs,colour=Prov,fill=Prov),position = "stack")+
-  facet_grid( ~ sector)+
-  #geom_col(aes(Prov,prov_ghgs/10^6,colour=sector,fill=sector,group=Ref_Year),size=1.5,position = "dodge")+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  #scale_x_discrete(breaks=c(seq(1990,2016,5)))+
-  scale_fill_manual("",values = my_palette[-7],guide = "legend")+
-  scale_colour_manual("",values=my_palette[-7],guide = "legend")+
-  #scale_fill_manual("",values =colors_tableau10() ,guide = "legend")+
-  #scale_colour_manual("",values=colors_tableau10() ,guide = "legend")+
-  guides(fill=guide_legend())+
-  theme_minimal()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.10,0,.10,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 12, face = "italic"),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size = 20, face = "italic"),
-    panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 14,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 14, colour = "black", angle = 90,hjust = -1),
-    strip.text.x = element_text(size = 9, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 16,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
-       title="1990-2018 sectoral GHG Emissions by Province",
-       #subtitle="Excluding Electricity",
-       caption="Source: Environment Canada National Inventory Data\nGraph by @andrew_leach")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-df1 %>% ungroup()%>% filter(sector=="Electricity",Year==2016) %>% mutate(sum=sum(GHGs))
-
-
-sub_samp$Prov<-fct_rev(sub_samp$Prov)
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("inventory_ghgs_2004.png")
-ggplot(subset(sub_samp,as.numeric(as.character(Year))>=2004),group=Year)+
-  #geom_col(aes(Year,GHGs,colour=sector,fill=sector),size=.35,position = "stack")+
-  geom_area(aes(as.numeric(as.character(Year)),GHGs,colour=sector,fill=sector),position = "stack")+
-  facet_grid( ~ Prov)+
-  #geom_col(aes(Prov,prov_ghgs/10^6,colour=sector,fill=sector,group=Ref_Year),size=1.5,position = "dodge")+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL))+
-  #scale_fill_viridis("",discrete=TRUE)+
-  scale_x_continuous(breaks=c(seq(1990,2016,5)))+
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  guides(fill=guide_legend(nrow =2,byrow=FALSE))+
-  theme_minimal()+theme(
-    legend.position = "bottom",
-    legend.margin=margin(c(.10,0,.10,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 14),
-    plot.caption = element_text(size = 18, face = "italic"),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size = 20, face = "italic"),
-    panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 8, colour = "black", angle = 90,hjust = 0),
-    strip.text.x = element_text(size = 14, colour = "black", angle = 0)
-  )+
-  labs(x=NULL,y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
-       title="2004-2016 Provincial GHG Emissions",
-       #subtitle="Excluding Electricity",
-       caption="Source: Environment Canada Preliminary Data\nGraph by @andrew_leach")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-#Upstream oil and gas
-upstream<-c("Natural Gas Production and Processing",
-            "Conventional Light Oil Production",                   
-            "Conventional Heavy Oil Production",                   
-            "Frontier Oil Production",                             
-            "Oil Sands")
-
-#Upstream oil and gas
-upstream_oil<-c(#"Natural Gas Production and Processing",
-  "Conventional Light Oil Production",                   
-  "Conventional Heavy Oil Production",                   
-  "Oil Sands Mining",
-  "Oil Sands In Situ",
-  "Oil Sands Upgrading")
-
-
-
-sub_samp<-subset(NIR_data,sector %in% upstream)
-df1<- sub_samp %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("upstream_ghgs.png")
-ggplot(df1,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_discrete(breaks=seq(1990,2016,2),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,200),breaks=seq(0,200,25),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =3,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Upstream oil and gas emissions by sector",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-df1<- subset(NIR_data,sector %in% upstream_oil) %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
-
-df_cement<- filter(NIR_data,sector %in% c(upstream_oil,"Cement")) %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("upstream_oil_ghgs_cement.png")
-ggplot(df_cement,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(data=df_cement%>%filter(sector!="Cement"),position = "stack") +
-  geom_line(data=df_cement%>%filter(sector=="Cement"),size=2) +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  scale_y_continuous(breaks = pretty_breaks(),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =3,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Upstream oil emissions by sector compared to cement",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("upstream_oil_ghgs.png")
-ggplot(df1,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_discrete(breaks=seq(1990,2016,2),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,200),breaks=seq(0,200,25),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =3,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Upstream oil emissions by sector",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-df1<- filter(NIR_data,sector %in% upstream_oil,Prov=="AB") %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("upstream_AB_oil_ghgs.png",width = 1500)
-ggplot(df1,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_discrete(breaks=seq(1990,2016,2),expand = c(0,0))+
-  scale_y_continuous(expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Alberta upstream oil emissions by sector",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-#"Oil Sands (Mining, In-situ, Upgrading)",
-oil_sands<-c("Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
-sub_samp<-subset(NIR_data,sector %in% oil_sands & Prov == "AB")
-
-ggplot(filter(NIR_data,sector %in% oil_sands & Prov == "AB")%>%mutate(sector=fct_rev(sector)))+
-  geom_area(aes(as.numeric(Year),GHGs,group = sector,fill=sector),color="black",position = "stack",alpha=0.6) +
-  geom_line(data=filter(NIR_data,sector=="Electricity" & Prov == "AB"),
-            aes(as.numeric(Year),GHGs,group = sector,colour=sector),size=1.4) +
-  
-  scale_fill_manual("",values = rev(colors_ua10()),guide = "legend")+
-  scale_colour_manual("",values=colors_ua10()[3],guide = "legend")+
-  scale_x_continuous(breaks=pretty_breaks(n=10),expand = c(0,0))+
-  #scale_y_continuous(limits=c(0,80),breaks=seq(0,80,20),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="",
-       #title=paste("Oil sands emissions by sector",sep=""),
-       #caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.",
-       NULL)
-ggsave("oil_sands_vs_power.png",width=12,height=6,dpi=300)
-
-
-#2019 AER data: ST98-2019-CrudeBitumen-SupplyDemand-Data-May-2019
-
-
-capp_data <- read_excel("Reports/CAPP/CAPP2019Forecast.xlsx", sheet = "Appendix A.1 Production", range = "A33:AA36")
-
-names(capp_data)<-c("supply",2010+seq(0:25)-1)
-capp_data<-capp_data%>%pivot_longer(-supply,values_to = "Production",names_to = "Year")
-
-
-st_98_bitumen<-"http://www1.aer.ca/st98/2020/data/crude-bitumen/ST98-CrudeBitumen-SupplyDemand.xlsx"
-download.file(st_98_bitumen,"Reports/ERCB/ST_98_bitumen.xlsx",mode="wb")
-
-prod_data <- read.xlsx(xlsxFile = "Reports/ERCB/ST98-2019-CrudeBitumen-SupplyDemand-Data-May-2019.xlsx", sheet = "Production", startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
-
-prod_data <- read.xlsx(xlsxFile = "Reports/ERCB/ST_98_bitumen.xlsx", sheet = "Production", startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
-
-#prod_data <- read.xlsx(xlsxFile = "Reports/ERCB/ST98-2018_BitumenSupplyDemand.xlsx", sheet = "Production", startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
-names(prod_data)<-c("Year","Oil Sands In Situ","Oil Sands Mining","Oil Sands Upgrading")
-prod_data<-prod_data %>% pivot_longer(-Year,values_to = "Production",names_to = "sector")
-bitumen_data<-prod_data %>% filter(sector!="Upgrading")%>% group_by(Year) 
-production_ghgs<-NIR_data %>% filter(Prov=="AB",sector %in% c("Oil Sands Mining","Oil Sands In Situ")) 
-bitumen_data<-bitumen_data %>% right_join(production_ghgs) %>% select(Year,sector,Production,GHGs)
-
-bitumen_total<-bitumen_data %>% group_by(Year)%>% summarize(sector="Oil Sands Average",Production=sum(Production),GHGs=sum(GHGs))
-bitumen_data<-bitumen_data %>% bind_rows(bitumen_total) %>% mutate(ghg_bbl=GHGs*10^6/Production/10^3/365)
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("AB_oil_sands_ghgs_bbl.png",height = 950,width = 1700)
-ggplot(bitumen_data,) +
-  geom_line(aes(Year,ghg_bbl,colour=sector,group=sector),size=2,lty=3)+
-  scale_colour_manual("",values=c("black",my_palette),guide = "legend")+
-  scale_x_continuous(breaks=pretty_breaks(n=10),expand = c(0,0))+
-  scale_y_continuous(breaks=pretty_breaks(n=5),expand = c(0,0))+
-  expand_limits(y=c(0,.12))+
-  guides(color=guide_legend(nrow=2,byrow=FALSE))+
-  slide_theme() +
-  labs(y=expression('Emissions Intensity  '*'(tCO'[2]*'e/bbl)'),x="Date",
-       title=paste("Alberta oil sands production emissions intensity by subsector",sep=""),
-       caption="Source: Environment Canada National Emissions Inventory Data and AER ST-3 Production Data\nGraph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-
-#sub_samp$Year<-as.character(sub_samp$Year)
-prod_data$Year<-as.character(prod_data$Year)
-df1<-merge(filter(NIR_data,Prov=="AB"),prod_data,by=c("Year","sector"))
-df1$Production<-df1$Production*365*1000 #barrels per year
-df1$GHG_bbl<-df1$GHGs*10^6/df1$Production
-
-
-
-
-#use st3 links
-load(file = "st3_link.Rdata") #production in million barrels per year
-df2<- NIR_data %>% filter(Prov=="AB",sector %in% upstream_oil) %>% left_join(ghg_production,by=c("Year"="year","sector"="product")) %>% na.omit() %>%
-  mutate(GHG_bbl=GHGs/production)%>% group_by(Year) %>%
-  mutate(avg_ghg_bbl=sum(GHGs)/sum(production)) %>% ungroup()
-
-prod_data_test<-prod_data %>% left_join(ghg_production,by=c("Year"="year","sector"="product")) %>% na.omit() %>% mutate(prod_bbld=production/365*10^3)
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("AB_oil_ghgs_bbl.png",height = 950,width = 1700)
-ggplot(df2,aes(Year,GHG_bbl,group = sector,colour=sector,fill=sector)) +
-  geom_line(,size=2) +
-  geom_line(aes(Year,avg_ghg_bbl,colour="Barrel-weighted Average"),size=2,lty=3)+
-  scale_colour_manual("",values=c("black",my_palette),guide = "legend")+
-  scale_x_continuous(breaks=pretty_breaks(n=8),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,.08),breaks=pretty_breaks(),expand = c(0,0))+
-  guides(color=guide_legend(nrow=2,byrow=FALSE))+
-  slide_theme() +
-  labs(y=expression('Emissions Intensity  '*'(tCO'[2]*'e/bbl)'),x="Date",
-       title=paste("Alberta oil sands and conventional oil emissions intensity by sector",sep=""),
-       caption="Source: Environment Canada National Emissions Inventory Data and AER ST-3 Production Data\nGraph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("oil_sands_history.png",height=1100,width=1600)
-#set_tiff("oil_sands_history.tiff",h_sent =800,w_sent =1200)
-ggplot(data=filter(prod_data,sector!="Oil Sands Upgrading"),aes(Year,Production,group = sector,colour=sector,fill=sector)) +
-  geom_area(position="stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  scale_y_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE))+
-  annotate("rect", fill = "grey70", alpha = 0.5, 
-           xmin = 2019, xmax =2028,
-           ymin = -Inf, ymax = Inf) +
-  annotate("text", x = 2024, y =450, label = "ST-98\nForecast",size=5)+
-  #slide_theme()+
-  theme(panel.border = element_blank(),
-        plot.margin = margin(1, 1, 1, 1, "cm"))+
-  labs(y=expression('Bitumen production (1000s of barrels per day)'),x="Date",
-       #title=paste("Oil sands production history and forecast",sep=""),
-       caption="Source: Alberta Energy Regulator Production Data and ST-98 (2019) Projection \nGraph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("oil_sands_history_bw.png",h_sent =600,w_sent =1000)
-ggplot(filter(prod_data,sector %in% c("In-situ", "Mining and Extraction")),aes(Year,Production,group = sector,colour=sector,fill=sector)) +
-  geom_area(position="stack") +
-  scale_fill_manual("",values = c("grey40","grey10"),guide = "legend")+
-  scale_colour_manual("",values=c("grey40","grey10"),guide = "legend")+
-  scale_x_discrete(breaks=seq(1970,2030,5),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,4000),breaks=seq(0,4000,500),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE))+
-  annotate("rect", fill = "grey70", alpha = 0.5, 
-           xmin = 2019-1967, xmax =2028-1967,
-           ymin = -Inf, ymax = Inf) +
-  annotate("text", x = 2023-1967, y = 3850, label = "ST-98\nForecast",size=2)+
-  
-  theme_classic() +
-  theme(panel.border = element_blank(),
-        plot.margin = margin(1, 1, 1, 1, "cm"),
-        panel.grid = element_blank(),
-        panel.grid.major.y = element_line(color = "gray",linetype="dotted"),
-        axis.line.x = element_line(color = "gray"),
-        axis.line.y = element_line(color = "gray"),
-        axis.text = element_text(size = 12),
-        axis.text.x = element_text(margin = margin(t = 5)),
-        axis.title = element_text(size = 12),
-        #axis.label.x = element_text(size=20,vjust=+5),
-        plot.subtitle = element_text(size = 12,hjust=0.5),
-        plot.caption = element_text(face="italic",size = 12,hjust=0),
-        legend.key.width=unit(2,"line"),
-        legend.position = "bottom",
-        #legend.direction = "horizontal",
-        #legend.box = "horizontal",
-        legend.text = element_text(size = 12),
-        plot.title = element_text(hjust=0,size = 14,margin = margin(b = 10))
-  )+
-  labs(y=expression('Bitumen production (1000s of barrels per day)'),x="Date")
-#title=paste("Oil sands production history and forecast",sep=""),
-#caption="Source: AlbeProduction Data and ST-98 (2018) Projection \nGraph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-#national production data
-
-eia_prod<-pdfetch_EIA("INTL.55-1-CAN-TBPD.A",KEY)
-eia_prod<-data.frame(date=index(eia_prod), coredata(eia_prod),stringsAsFactors = F)
-names(eia_prod)<-c("date","oil_production")
-eia_prod$Year<-year(eia_prod$date)
-oil_emissions<-NIR_CAN %>% filter(sector %in% upstream_oil) %>%
-  group_by(Year) %>% summarize(oil_ghgs=sum(GHGs)) %>%
-  left_join(eia_prod) %>% mutate(oil_ei=oil_ghgs*10^6/(oil_production*1000*365))
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("oil_ei.png",height =600,width =1000)
-ggplot(oil_emissions,aes(date,oil_ei)) +
-  geom_line(size=2) +
-  tombe_theme()+theme(plot.margin = margin(1, 1, 1, 1, "cm"))+
-  scale_x_date(breaks = date_breaks("2 years"),date_labels = "%Y")+
-  labs(y=expression('Oil Emissions Intensity (tonnes per barrel)'),x="Year",
-       title="Canadian oil production average emissions intensity",
-       caption="Sources: Oil production data via EIA, upstream oil production emissions (including upgrading) from Canada's National Inventory Report (2019).\nGraph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-oil_sands<-c("Oil Sands (Mining, In-situ, Upgrading)")
-oil_sands<-c("Mining and Extfraction","In-situ","Upgrading")
-
-sub_samp<-subset(NIR_data,sector %in% oil_sands & Prov == "AB")
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("oil_sands_ghgs.png")
-ggplot(df1,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_discrete(breaks=seq(1990,2016,2),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,80),breaks=seq(0,80,20),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Oil sands emissions",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-sub_samp<-subset(NIR_data, Prov == "AB")
-
-sub_samp<-subset(NIR_data,sector=="National Inventory Total" & Prov == "AB")
-
-sub_samp<-subset(NIR_data,sector=="Transportation" & Prov == "AB")
-
-transport_sec<-c("Cars, Trucks and Motorcycles",
-                 "Bus, Rail and Domestic Aviation",
-                 "Freight Transport",
-                 "Other: Recreational, Commercial and Residential"
-)
-sub_samp<-subset(NIR_data,sector%in%transport_sec & Prov == "AB")
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("AB_transport.png")
-ggplot(sub_samp,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_continuous(breaks=seq(1990,2016,2),expand = c(0,0))+
-  scale_y_continuous(limits=c(0,40),breaks=seq(0,40,10),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =2,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Alberta Transport Emissions",sep=""),
-       caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-oil_sands_sger_data <- read.xlsx(xlsxFile = "2016_Compliance_Report.xlsx", sheet = "oilsands", startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
-oil_sands_sger_data <-oil_sands_sger_data %>% select(Facility.Name,Facility.ID,Reporting.Company.Name,
-                                                     `Total.Annual.Emissions.(TAE)`,
-                                                     `Net.electricity.import(+)/.export(-)`,
-                                                     Total.Production,
-                                                     `OBA,.bitumen`,`OBA,.net.electricity`,OBA.total,SGER.Baseline.Emissions.Intensity,Emissions
-                                                     
-) %>% filter(!is.na(`Total.Annual.Emissions.(TAE)`))
-
-ggplot(oil_sands_sger_data)+
-  geom_point(aes(Emissions/(Total.Production*6.2929),OBA.total/(Total.Production*6.2929)) )
-
-
-
-
-power_sger_data <- read.xlsx(xlsxFile = "2016_Compliance_Report.xlsx", sheet = "Power", startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
-#power_sger_data$`SGER.Free.Credits.($/MWh)`
-dat.g <- gather(power_sger_data, `SGER.Free.Credits.($/MWh)`, `CCR.Free.Credits`)
-df1<-melt(power_sger_data,id=c("Facility.Name","Emissions","Emissions.Intensity","Plant.Type"),measure.vars = c("SGER.Free.Credits.($/MWh)","CCR.Free.Credits"), value.name = "Credits",variable.name = "Policy")
-df1$test<-factor(df1$Policy,labels =c("SGER","CCR") )
-ggplot(df1, aes(test, Credits)) + 
-  geom_bar(aes(fill = Plant.Type), stat = "identity", position = "dodge")+
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  slide_theme()+
-  labs(y=expression('Value of Emissions Credits ($/MWh)'),x="",
-       title=paste("Credit Value By Plant Type",sep=""),
-       caption="Source: Alberta Environment Emissions Intensity Data, graph by Andrew Leach.")
-
-df1<-melt(power_sger_data,id=c("Facility.Name","Emissions","Emissions.Intensity","Plant.Type"),measure.vars = c("SGER.Free.Credits.($/MWh)","CCR.Free.Credits"), value.name = "Credits",variable.name = "Policy")
-df1$test<-factor(df1$Policy,labels =c("SGER","CCR") )
-ggplot(df1, aes(Emissions.Intensity, Credits,group=test)) + 
-  geom_point(aes(colour = Plant.Type,fill=Plant.Type,shape=test,size=Emissions/10^6))+
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_shape_manual(values=c(15,18,16,17,19))+
-  scale_y_continuous(limits=c(0,40))+
-  slide_theme()+
-  labs(y=expression('Value of Emissions Credits ($/MWh)'),x="Emissions Intensity (t/MWh)",
-       title=paste("Credit Value By Plant Type",sep=""),
-       caption="Source: Alberta Environment Emissions Intensity Data, graph by Andrew Leach.")
-
-
-
-
-
-cdn_data<-NULL
-cdn_data<-filter(NIR_data,sector=="Inventory Total") %>% group_by(Year) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE)) %>%
-  mutate(Year=as.numeric(as.character(Year)), ghg=as.numeric(GHGs)) %>%
-  bind_rows(data.frame(Year=c(2020,2030,2050),target=731.7137*c(1-.17,1-.30,1-1),projection=c(728,722,NA),bau=c(768,815,NA),adds=c(690,583,NA)))
-cdn_data$projection[cdn_data$Year==2016]<-cdn_data$ghg[cdn_data$Year==2016]
-cdn_data$bau[cdn_data$Year==2016]<-cdn_data$ghg[cdn_data$Year==2016]
-cdn_data$target[cdn_data$Year==2016]<-cdn_data$ghg[cdn_data$Year==2016]
-cdn_data$adds[cdn_data$Year==2016]<-cdn_data$ghg[cdn_data$Year==2016]
-
-# Ontario's GHG levels and future targets
-#data<-read_excel("EN-Tables_ON_1990-2015_Unrounded_Data.xlsx",
-#                 sheet="Summary",range="F6:AE7") %>%
-#  gather(year,ghg) %>%
-#  mutate(year=as.numeric(year),
-#         ghg=as.numeric(ghg)) %>%
-#  bind_rows(data.frame(year=c(2020,2030,2050),target=181267.9*c(1-.15,1-.37,1-.8)))
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("emissions_and_targets.png")
-ggplot(cdn_data,aes(Year,ghg))+
-  geom_line(size=2,color="firebrick")+
-  geom_point(aes(y=target),size=3,color="#262164")+
-  geom_point(aes(y=projection),size=3,color="#FFDB05")+
-  geom_point(aes(y=bau),size=3,color="firebrick")+
-  geom_point(aes(y=adds),size=3,color="#007C41")+
-  geom_line(aes(y=projection),size=2,color="#FFDB05",linetype=3)+
-  geom_line(aes(y=bau),size=2,color="firebrick",linetype=3)+
-  geom_line(aes(y=target),size=2,color="#262164",linetype=3)+
-  geom_line(aes(y=adds),size=2,color="#007C41",linetype=3)+
-  geom_point(data=cdn_data %>% filter(Year==2016),size=3,color="firebrick")+
-  geom_hline(yintercept=0,size=1)+
-  geom_text_repel(data=subset(cdn_data,Year!=2016),aes(y=target-10,label=paste("   ",Year,"Target   ")),color="#262164",
-                  fontface="bold",point.padding = unit(1,"mm"),segment.alpha = 0)+
-  annotate("text",x=2031,y=815,label="Second Biennial Report Projection (2016)",
-           color="firebrick",fontface="bold",hjust=0)+
-  annotate("text",x=2031,y=701,label="2018 Reference Case",
-           color="#FFDB05",fontface="bold",hjust=0)+
-  annotate("text",x=2031,y=583,label="Pan Canadian Framework Projection (2018)",
-           color="#007C41",fontface="bold",hjust=0)+
-  annotate("text",x=1997,y=790,label="Historical Emissions (1990-2016)",
-           color="firebrick",fontface="bold",hjust=0)+
-  tombe_theme+
-  scale_y_continuous(limit=c(0,825))+
-  scale_x_continuous(limit=c(1990,2052),breaks=seq(1990,2050,10),expand = c(0,0))+
-  labs(x="",y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
-       title="Canada's GHG Emissions, Projections and Future Targets",
-       subtitle="Source: Environment and Climate Change Canada 2016 Preliminary Emissions Inventory (2018); Second and Third Biennial Report to the United Nations (2016,2018), and February 2018 PCF Update.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-
-#ZEKE's target graph
-
-data<-read_excel("Papers/Pipelines/Gap Analysis 2018.xlsx") 
-#  gather(year,ghg) %>%
-#  mutate(year=as.numeric(year),
-#         ghg=as.numeric(ghg)) %>%
-#  bind_rows(data.frame(year=c(2020,2030,2050),target=181267.9*c(1-.15,1-.37,1-.8)))
-tombe_theme<-theme_minimal()+theme(
-  axis.title.y = element_text(size=9),
-  axis.title.x = element_text(size=9),
-  legend.position = "top",
-  legend.text=element_text(size=10),
-  legend.margin=margin(c(0,0,-0.25,0),unit="cm"),
-  plot.caption = element_text(size = 6, color = "gray40",hjust=1),
-  plot.title = element_text(face = "bold"),
-  plot.subtitle = element_text(size = 8, color = "gray40"),
-  panel.grid.minor = element_blank(),
-  panel.grid.major.x = element_blank()
-)
-
-
-data_long<-melt(data,id="year",value.name = "ghgs",variable.name = "scenario")
-palette<-rev(viridis(7,option = "C"))[-1]#[-c(1,2,3)]
-#palette<-c("firebrick",colors_tableau10()[-c(3,4,7,8,9)])
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("emissions_gap.png")
-ggplot(data_long)+
-  geom_line(aes(x=year,y=ghgs,group=scenario,colour=scenario),size=3)+
-  #geom_text_repel(data=subset(cdn_data,Year!=2016),aes(y=target,label=paste("   ",Year,"Target   ")),color="#262164",
-  #                fontface="bold",point.padding = unit(1,"mm"),segment.alpha = 0)+
-  annotate("text",x=2031,y=65,label="Baseline",
-           color=palette[1],fontface="bold",hjust=0)+
-  annotate("text",x=2031,y=60,label="Current Policies Projection",
-           color=palette[2],fontface="bold",hjust=0)+
-  annotate("text",x=2031,y=56,label="Unconditional NDCs",
-           color=palette[3],fontface="bold",hjust=0)+
-  annotate("text",x=2031,y=53,label="Conditional NDCs",
-           color=palette[4],fontface="bold",hjust=0)+
-  annotate("text",x=2040,y=35,label="2C Scenario",
-           color=palette[5],fontface="bold",hjust=0)+
-  annotate("text",x=2040,y=15,label="1.5C Scenario",
-           color=palette[6],fontface="bold",hjust=0)+
-  annotate("rect", fill = "grey", alpha = 0.25, 
-           xmin = 2025, xmax =2030, ymin = -Inf, ymax = Inf)+
-  annotate("text", x = 2027.5, y = 70, label = "Paris Commitment\nPeriod",size=3)+
-  annotate("rect", fill = "grey", alpha = 0.25, 
-           xmin = 2018, xmax =2018.1, ymin = -Inf, ymax = Inf)+
-  annotate("text", x = 2017, y = 70, label = "Today",size=3)+
-  #annotate("text",x=2010,y=65,label="Historical Emissions (2010-2018)",
-  #         color="firebrick",fontface="bold",hjust=0)+
-  theme(legend.position = "none")+
-  scale_y_continuous(limit=c(0,70))+
-  scale_x_continuous(limit=c(2010,2052),breaks=seq(2010,2050,10),expand = c(0,0))+
-  scale_color_manual(values=palette)+
-  labs(x="",y=expression('Annual Emissions '*'(GtCO'[2]*'e)'),
-       title="Global GHG Emissions, Projections and Mitigation Scenarios",
-       subtitle="Source: UNEP Emissions Gap Report, Data via Zeke Hausfather, Carbon Brief")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-
-
-# Treemap of Ontario's Emissions
-library(treemapify)
-
-makeColors <- function(){
-  maxColors <- 11
-  usedColors <- c()
-  possibleColors <- colorRampPalette( brewer.pal( 11 , "Set3" ) )(maxColors)
-  
-  function(values){
-    newKeys <- setdiff(values, names(usedColors))
-    newColors <- possibleColors[1:length(newKeys)]
-    usedColors.new <-  c(usedColors, newColors)
-    names(usedColors.new) <- c(names(usedColors), newKeys)
-    usedColors <<- usedColors.new
-    
-    possibleColors <<- possibleColors[length(newKeys)+1:maxColors]
-    usedColors
-  }
-} 
-
-mkColor <- makeColors()
-
-#plotdata<-read_excel("../Dropbox/Tweets Data/GHG/EN-Tables_ON_1990-2015_Unrounded_Data.xlsx",
-#                     sheet="Summary",range="AL9:AN30") %>%
-#  group_by(BigType) %>%
-#  mutate(totalghg=sum(GHGs))
-sector_data<-NULL
-sector_data<-filter(NIR_data,sector %in% main_sectors) %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE)) %>%
-  ungroup() %>% mutate(Year=as.numeric(as.character(Year)), ghg=as.numeric(GHGs))
-
-
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("emissions_treemap.png")
-ggplot(subset(sector_data,Year==2016),aes(subgroup=reorder(sector,-ghg),
-                                          fill=reorder(sector,-ghg),area=ghg)) + 
-  geom_treemap(color="white",size=2)+
-  geom_treemap_subgroup_border(size=2,color="white")+
-  geom_treemap_text(aes(label=sector),fontface="bold",place="center",reflow=T,size=10)+
-  scale_fill_manual(name="Major Category:",values=mkColor(unique(sector_data$sector)))+
-  theme_minimal()+
-  theme(legend.position = "right")+
-  labs(x="",y="",
-       title="Canada's Greenhouse Gas Emissions in 2016",
-       subtitle="Source: Environment and Climate Change Canada, National Inventory Report (2018)",
-       caption="Graph by Andrew Leach, code courtesy of Trevor Tombe"
-  )
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-prov_data<-NULL
-prov_data<-NIR_data %>% group_by(Year,Prov) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE)) %>%
-  ungroup() %>% mutate(Year=as.numeric(as.character(Year)), ghg=as.numeric(GHGs))
-
-
-
-
-
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("prov_treemap.png")
-ggplot(subset(prov_data,Year==2016),aes(subgroup=reorder(Prov,-ghg),
-                                        fill=reorder(Prov,-ghg),area=ghg)) + 
-  geom_treemap(color="white",size=2)+
-  geom_treemap_subgroup_border(size=2,color="white")+
-  geom_treemap_text(aes(label=Prov),fontface="bold",place="center",reflow=T,size=10)+
-  scale_fill_manual(name="Province:",values=mkColor(unique(prov_data$Prov)))+
-  tombe_theme+
-  theme(legend.position = "right")+
-  labs(x="",y="",
-       title="Canada's Greenhouse Gas Emissions in 2016",
-       subtitle="Source: Environment and Climate Change Canada, National Inventory Report (2018)",
-       caption="Graph by Andrew Leach, code courtesy of Trevor Tombe"
-  )
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-
-#getting national communication info
-library(tabulizer)
-f <- "canada_nc7.pdf"
-
-# extract tables from only second page
-oil_sands_table<-data.frame(extract_tables(f, pages = 143)[1],stringsAsFactors = F)
-oil_sands_table<-oil_sands_table[-1,] #drop the first row
-oil_sands_table<-oil_sands_table[-14,] #drop the total row
-oil_sands_table<-oil_sands_table[,-7] #drop the growth column
-oil_sands_table[1,1]<-"sector" #add variable labels
-colnames(oil_sands_table)<-oil_sands_table[1,]
-oil_sands_table<-oil_sands_table[-1,] #drop the first row
-
-
-sector_table<-data.frame(extract_tables(f, pages = 142)[1],stringsAsFactors = F)
-sector_table<-sector_table[-1,] #drop the first row
-sector_table<-sector_table[,-7] #drop the growth column
-sector_table[1,1]<-"sector" #add variable labels
-colnames(sector_table)<-sector_table[1,]
-sector_table<-sector_table[-1,] #drop the first row
-
-nat_com<-rbind(sector_table,oil_sands_table)
-nat_com<-melt(nat_com,id="sector",value.name = "GHGs",variable.name = "Year") %>% mutate(GHGs=as.numeric(GHGs))
-nat_com$sector[nat_com$sector=="Oil Sandsf"]<-"Oil Sands"
-nat_com$Year<-as.numeric(as.character(nat_com$Year))
-#nat_com$sector[nat_com$sector=="Oil Sands"]<-"Oil Sands (Mining, In-situ, Upgrading)"
-#nat_com$sector[nat_com$sector=="Bitumen In Situ"]<-"In Situ"
-#nat_com$sector[nat_com$sector=="Bitumen Mining"]<-"Mining and Extraction"
-#nat_com$sector[nat_com$sector=="Bitumen Upgrading"]<-"Mining and Extraction"
-
-
-#ECCC 2018 December projections
-
-ec_2018_file <- "ECCC_DEC_2018.pdf"
-# extract tables from only second page
-econ_table<-data.frame(extract_tables(ec_2018_file, pages = 9),stringsAsFactors = F)
-
-
-ec_2019_file<-"Reports/Environment Canada/progress-towards-ghg-emissions-target-en.pdf"
-progress_annex_table<-data.frame(extract_tables(ec_2019_file, pages = 12),stringsAsFactors = F)
-progress_annex_table<-progress_annex_table[-c(1:7),]
-progress_annex_table[,1:6] <- sapply(progress_annex_table[,1:6], as.numeric)
-names(progress_annex_table)<-c("Year",
-                               "Second_Biennial",
-                               "2017_Ref",
-                               "2018_Ref",
-                               "Adds_Case",
-                               "Target Case")
-progress_annex_table$`Target Case`<-NULL
-progress_annex_table$sector<-"Total, Canada"
-progress_annex_table$Adds_Case[progress_annex_table$Year==2030] <-592
-
-
-
-
-
 #Environment Canada Emissions Projection Data
 
 #2020 projections data
@@ -1351,10 +599,6 @@ names(proj_data)<-c("region","scenario","sector","subsector_level_1","subsector_
 proj_data<-proj_data %>% bind_rows(proj_data_2020,proj_data_2018)%>%
   filter(scenario!="NIR 2018",scenario!="NIR 2019",sector!="Total")
 
-
-
-
-
 proj_data<-proj_data %>% filter(!sector%in%c("International Emissions","n/a","WCI Credits"))%>%
   mutate(prov=as.factor(region),
          prov=fct_recode(prov,"AB"="Alberta",
@@ -1380,15 +624,7 @@ proj_data<-proj_data %>% filter(!sector%in%c("International Emissions","n/a","WC
   select(year,prov,region,scenario,emissions,sector)%>% group_by(year,prov,sector,scenario)%>%summarize(emissions=sum(emissions,na.rm = T)) %>%ungroup()
 
 
-#proj_data [1] "Agriculture"      "Buildings"        "Electricity"      "Heavy Industry"   "Oil and Gas"     
-#[6] "Transportation"   "Waste and Others"
-
-#main sectors  [1] "Oil and Gas"x         "Electricity" x        "Transportation"x      "Heavy Industry"x      
-#"Buildings"  x [6] "Agriculture" x         "Waste"               "Coal Production"     "Light Manufacturing" "Construction"       
-#[11] "Forest Resources" 
-
-#strip out nir from this csv, build in mine
-
+#strip out nir from this csv, build new NIR
 
 proj_data<-proj_data%>% filter(scenario!="NIR 2018",scenario!="NIR 2019",scenario!="NIR 2020")%>% bind_rows(test=NIR_data %>%
                                                                                                               filter(sector %in% main_sectors)%>%
@@ -1746,65 +982,59 @@ ggsave("images/inventory_per_capita.png",dpi = 300,width=14, height=7)
 
 
 
-legend_labels<-c(paste(str_wrap("ECCC 'Reference Case 2019' emissions projection",width = 20),"\n",sep=""),
-                 paste(str_wrap("Emissions-weighted share of Canada's Paris target: 30% below 2005 emissions",width = 20),"\n",sep=""))
+#get older natcom and trends information
+
+#getting national communication info
+library(tabulizer)
+f <- "data/canada_nc7.pdf"
+
+# extract tables from only second page
+oil_sands_table<-data.frame(extract_tables(f, pages = 143)[1],stringsAsFactors = F)
+oil_sands_table<-oil_sands_table[-1,] #drop the first row
+oil_sands_table<-oil_sands_table[-14,] #drop the total row
+oil_sands_table<-oil_sands_table[,-7] #drop the growth column
+oil_sands_table[1,1]<-"sector" #add variable labels
+colnames(oil_sands_table)<-oil_sands_table[1,]
+oil_sands_table<-oil_sands_table[-1,] #drop the first row
 
 
+sector_table<-data.frame(extract_tables(f, pages = 142)[1],stringsAsFactors = F)
+sector_table<-sector_table[-1,] #drop the first row
+sector_table<-sector_table[,-7] #drop the growth column
+sector_table[1,1]<-"sector" #add variable labels
+colnames(sector_table)<-sector_table[1,]
+sector_table<-sector_table[-1,] #drop the first row
+
+nat_com<-rbind(sector_table,oil_sands_table)
+nat_com<-nat_com %>% pivot_longer(cols=-sector,values_to = "GHGs",names_to = "Year") %>% mutate(GHGs=as.numeric(GHGs))
+nat_com$sector[nat_com$sector=="Oil Sandsf"]<-"Oil Sands"
+nat_com$Year<-as.numeric(as.character(nat_com$Year))
+#nat_com$sector[nat_com$sector=="Oil Sands"]<-"Oil Sands (Mining, In-situ, Upgrading)"
+#nat_com$sector[nat_com$sector=="Bitumen In Situ"]<-"In Situ"
+#nat_com$sector[nat_com$sector=="Bitumen Mining"]<-"Mining and Extraction"
+#nat_com$sector[nat_com$sector=="Bitumen Upgrading"]<-"Mining and Extraction"
 
 
+#ECCC 2018 December projections
+
+ec_2018_file <- "data/ECCC_DEC_2018.pdf"
+# extract tables from only second page
+econ_table<-data.frame(extract_tables(ec_2018_file, pages = 9),stringsAsFactors = F)
 
 
-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2019", "2019 Reference Case") & prov !="Canada"))+
-  geom_area(aes(year,emissions*10^6/pop,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  facet_wrap( ~ prov,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_minimal()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 12, face = "italic"),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust = -1),
-    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="2005-2030 Provincial GHG Emissions",
-       subtitle=paste("Inventory GHG Emissions (2005-2017) and Reference Case Projections (2018-2030)\n",
-                      str_wrap("Projections include policies and measures that were in place as of September 2019 (Reference Case) and
-policies and measures under development but not yet fully implemented (Additional Measures)",width=120),sep=""),
-       caption="Source: Environment Canada National Inventory Data and Reference Case Projections, graph by @andrew_leach")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
-
-
-legend_labels<-c(paste(str_wrap("ECCC 'Reference Case 2019' emissions projection",width = 20),"\n",sep=""),
-                 paste(str_wrap("Emissions-weighted share of Canada's Paris target: 30% below 2005 emissions",width = 20),"\n",sep=""))
-
-
-
-
-
-
-
-str_pad_custom <- function(labels){
-  #new_labels <- stringr::str_pad(labels, 10, "right")
-  new_labels <- paste(labels,"\n",sep="")
-  return(new_labels)
-}
+ec_2019_file<-"data/progress-towards-ghg-emissions-target-en.pdf"
+progress_annex_table<-data.frame(extract_tables(ec_2019_file, pages = 12),stringsAsFactors = F)
+progress_annex_table<-progress_annex_table[-c(1:7),]
+progress_annex_table[,1:6] <- sapply(progress_annex_table[,1:6], as.numeric)
+names(progress_annex_table)<-c("Year",
+                               "Second_Biennial",
+                               "2017_Ref",
+                               "2018_Ref",
+                               "Adds_Case",
+                               "Target Case")
+progress_annex_table$`Target Case`<-NULL
+progress_annex_table$sector<-"Total, Canada"
+progress_annex_table$Adds_Case[progress_annex_table$Year==2030] <-592
 
 
 sectors<-unique(nat_com$sector)
@@ -1886,7 +1116,7 @@ cdn_data <- cdn_data %>% mutate(scenario=as_factor(scenario),
 #ggplot(canadian_data)+geom_line(aes(year,emissions,group=scenario,color=scenario))
 
 
-palette<-c("Black",colors_tableau10()[1:4],"dodgerblue",colors_tableau10()[5:10])
+palette<-c(colors_tableau10()[1:4],"dodgerblue",colors_tableau10()[5:10])
 
 targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scenario!="2019 Reference Case",
                                                                 scenario!="2018 Reference Case",
@@ -1900,32 +1130,30 @@ targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(s
   scale_color_manual("",values=palette[-1])+
   annotate("text",x=1990+(2019-1990)/2,y=790,label="National Inventory Emissions (1990-2019)",
            color="black",fontface="bold",hjust=0.5)+
-  #geom_text(data=cdn_data%>%filter(year==2030,!grepl('Additional', scenario)),
-  #         aes(x=2036,y=emissions+(scenario=="2020 Reference Case")*-30+(scenario=="2017 Reference Case")*10
-  #               ,label=scenario,color=scenario))+
-  
-  geom_point(aes(2010,565),size=5,colour=palette[9])+ #rio target
-  #geom_line(aes(y=kyoto),size=5,colour=palette[9],linetype=1)+
-  annotate("text",x=2009,y=565,label="Kyoto Target (6% below 1990 levels, 2008-2012)",
-           colour=palette[9],fontface="bold",hjust=1)+
-  #geom_line(data=filter(cdn_data,sector=="Oil Sands"),aes(year,GHGs,group=sector),colour=palette[5],size=2)+
-  #annotate("text",x=2005,y=110,label="Third Biennial Report (2018)\nOil Sands Projection",
-  #         colour=palette[5],fontface="bold",hjust=1)+
+  #Rio
   annotate("text",x=2001,y=603.22,label="Rio Target (return to 1990 levels by 2000)",
            colour=palette[9],fontface="bold",hjust=0)+
-  
+  #kyoto
+  #geom_point(aes(2010,565),size=5,colour=palette[9])+ #kyoto target
+  geom_errorbarh(aes(xmin=2008,y=565,xmax=2012),height=40,size=2,colour=palette[9])+
+  annotate("text",x=2007,y=565,label="Kyoto Target (6% below 1990 levels, 2008-12)",
+           colour=palette[9],fontface="bold",hjust=1)+
+  #copenhagen
   annotate("text",x=2021,y=607.32,label="Copenhagen Target (17% below 2005 levels by 2020)",
            colour=palette[9],fontface="bold",hjust=0)+
+  #paris
   annotate("text",x=2029,y=512.9,label="Paris Target (30% below 2005 levels by 2030)",
            colour=palette[9],fontface="bold",hjust=1)+
-  geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
+  #glasgow
+  #geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
+  geom_errorbar(aes(x=2030,ymax=443,ymin=406.3),width=1..4,size=2,colour=palette[9])+
   annotate("text",x=2029,y=423,label="Glasgow Target (40-45% below 2005 levels by 2030)",
            colour=palette[9],fontface="bold",hjust=1)+
+  #2050
   annotate("text",x=2049,y=30,label="2050 Net Zero Goal",
            colour=palette[9],fontface="bold",hjust=1)+
+  
   geom_hline(yintercept=0,size=1)+
-  #geom_text_repel(data=filter(cdn_data,sector=="Total, Canada",year %in% c(2020,2030,2050)),aes(y=target,label=paste("   ",year,"Target   ")),colour=palette[5],
-  #                fontface="bold",point.padding = unit(2,"mm"),segment.alpha = 0)+
   scale_y_continuous(limit=c(0,825))+
   scale_x_continuous(limit=c(1990,2052),breaks=seq(1990,2050,10),expand = c(0,0))+
   tombe_theme()+theme(legend.position = "none")+
