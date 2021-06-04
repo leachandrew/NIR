@@ -3,13 +3,10 @@ title: Canada's National Greenhouse Gas Emissions Inventory Report (NIR) and Pro
 #subtitle: Graphs using Canada's NIR and emissions projections
 # Your name to show in the footer
 author: Andrew Leach
-
 #theme: jekyll-theme-cayman
-
-
 plugins:
   - jekyll-remote-theme
-  
+
 remote_theme: daattali/beautiful-jekyll
 
 navbar-links:
@@ -19,7 +16,7 @@ navbar-links:
   IPCC Sectors: "ipcc_sectors"
   Projections: "projections"
   Alberta: "alberta"
-  Github Repo: "https://github.com/leachandrew/NIR"
+  Github: "https://github.com/leachandrew/NIR"
 
 # --- Logo --- #
 
