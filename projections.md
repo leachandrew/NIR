@@ -18,3 +18,19 @@ and here are the same data, arrayed by sector with colors for each province or r
 <a href="images/emissions_and_targets_simple.png" target="_blank">
   <img border="0" align="center"  src="images/inventory_sector.png"/>
 </a>
+
+
+
+We can also look carefully at a couple of key sectors: 
+
+Oil and gas
+
+<a href="images/emissions_and_targets_simple.png" target="_blank">
+  <img border="0" align="center"  src="images/oil_gas_proj.png"/>
+</a>
+
+and power
+
+<a href="images/emissions_and_targets_simple.png" target="_blank">
+  <img border="0" align="center"  src="images/power_proj.png"/>
+</a>
