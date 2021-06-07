@@ -16,7 +16,7 @@ We can also combine the inventory data with projections to give a sense of where
 and here are the same data, arrayed by sector with colors for each province or region:
 
 <a href="images/emissions_and_targets_simple.png" target="_blank">
-  <img border="0" align="center"  src="images/inventory_sector.png"/>
+  <img border="0" align="center"  src="images/sector_proj.png"/>
 </a>
 
 
