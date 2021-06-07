@@ -3,3 +3,9 @@ Slicing Canada's emissions inventory by economic sector and province shows a sur
 <a href="images/inventory_sector.png" target="_blank">
   <img border="0" align="center"  src="images/inventory_sector.png"/>
 </a>
+
+and the same data augmented with current reference case projections.
+
+<a href="images/inventory_sector.png" target="_blank">
+  <img border="0" align="center"  src="images/inventory_proj.png"/>
+</a>
