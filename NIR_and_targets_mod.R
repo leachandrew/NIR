@@ -957,16 +957,19 @@ upstream<-c("Natural Gas Production and Processing",
             "Oil Sands")
 
 #Upstream oil and gas
-upstream_oil<-c(#"Natural Gas Production and Processing",
-            "Conventional Light Oil Production",                   
-            "Conventional Heavy Oil Production",                   
+upstream_oil<-c(
+  "Natural Gas Production and Processing",
+  "Conventional Oil Production",
             "Oil Sands Mining",
             "Oil Sands In Situ",
-            "Oil Sands Upgrading")
+            "Oil Sands Upgrading",
+  "Oil, Natural Gas and CO2  Transmission")
+
             
 
 
-sub_samp<-subset(NIR_data,sector %in% upstream)
+sub_samp<-subset(NIR_data,sector %in% upstream_oil)%>%
+  mutate(sector=fct_recode(sector,"Pipelines"="Oil, Natural Gas and CO2  Transmission"))
 df1<- sub_samp %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
 
 png<-1
