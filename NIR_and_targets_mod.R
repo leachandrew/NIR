@@ -1,9 +1,6 @@
-#Mac
-if(R.version$platform ==  "x86_64-apple-darwin15.6.0")
-  setwd("/Users/aleach/Google Drive")
-#PC
+
 if(R.version$platform ==  "x86_64-w64-mingw32")
-  setwd("C:/Users/aleach/Google Drive")
+  setwd("C:/Users/aleach/Documents/data_projects/NIR")
 print(getwd())
 
 source("andrew_base.R")
@@ -969,25 +966,38 @@ upstream_oil<-c(
 
 
 sub_samp<-subset(NIR_data,sector %in% upstream_oil)%>%
-  mutate(sector=fct_recode(sector,"Pipelines"="Oil, Natural Gas and CO2  Transmission"))
+  mutate(sector=fct_recode(sector,"Oil and Gas Transmission"="Oil, Natural Gas and CO2  Transmission"),
+         sector=fct_relevel(sector,"Oil and Gas Transmission",after = Inf),
+         sector=fct_relevel(sector,"Natural Gas Production and Processing")
+         )
 df1<- sub_samp %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
 
-png<-1
-if(png==1)#set these to only turn on if you're making PNG graphs
-  set_png("upstream_ghgs.png")
-ggplot(df1,aes(Year,GHGs,group = sector,colour=sector,fill=sector)) +
-  geom_area(position = "stack") +
-  scale_fill_manual("",values = my_palette,guide = "legend")+
-  scale_colour_manual("",values=my_palette,guide = "legend")+
-  scale_x_discrete(breaks=seq(1990,2016,2),expand = c(0,0))+
+ggplot(df1,aes(Year,GHGs,group = sector,fill=sector)) +
+  geom_area(position = "stack",size=.5,colour="black") +
+  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  #scale_colour_manual("",values=my_palette,guide = "legend")+
+  scale_x_continuous(breaks=pretty_breaks(),expand = c(0,0))+
   scale_y_continuous(limits=c(0,200),breaks=seq(0,200,25),expand = c(0,0))+
-  guides(fill=guide_legend(nrow =3,byrow=FALSE))+
-  slide_theme()+
-  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="Date",
-       title=paste("Upstream oil and gas emissions by sector",sep=""),
+  guides(fill=guide_legend(nrow =2,byrow=FALSE))+
+  theme_minimal()+theme(
+    legend.position = "bottom",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),x="",
+       title=paste("Canadian upstream oil and gas emissions by subsector",sep=""),
        caption="Source: Environment Canada Inventory Data, graph by Andrew Leach.")
-if(png==1)#set these to only turn on if you're making PNG graphs
-  dev.off()
+ggsave("images/upstream_ghgs.png",width=14,height=7,dpi=300)
 
 df1<- subset(NIR_data,sector %in% upstream_oil) %>% group_by(Year,sector) %>% summarise(GHGs=sum(GHGs,na.rm = TRUE))
 
@@ -1654,8 +1664,13 @@ names(proj_data_2018)<-c("region","scenario","sector","subsector_level_1","subse
 
 
 #load 2019 detailed projections data
+
+file_loc<-"https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2019/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
+download.file(file_loc,destfile="ec_projections_2019.csv",mode = "wb")
+
 proj_data<-
-  read_csv("detailed_GHG_emissions_GES_detaillees_2019.csv",skip = 0,na = "-",col_types = cols(.default = "c")) %>%
+  read_csv("ec_projections_2019.csv",skip = 0,na = "-",col_types = cols(.default = "c")) %>%
+  #read_csv("detailed_GHG_emissions_GES_detaillees_2019.csv",skip = 0,na = "-",col_types = cols(.default = "c")) %>%
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
   mutate_if(is.double,as.character()) %>%
   pivot_longer(-c(1:7),names_to = "year",values_to = "emissions")%>%
@@ -1786,7 +1801,7 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021", "2020 Reference
   )+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
        title="Canadian GHG Emissions by Province",
-       subtitle=paste("2021 National Inventory (1990-2019) levels and 2020 Reference Case projections (2019-2030)",sep=""),
+       subtitle=paste("2021 National Inventory (1990-2019) levels and 2020 Reference Case projections (2020-2030)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada. Reference Case projections include policies and measures that were in place as of September 2019. Graph by @andrew_leach.",width = 180))
 ggsave("inventory_proj.png",dpi = 300,width=14, height=7)
 
@@ -1864,21 +1879,21 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021", "2020 Reference
 ggsave("power_proj.png",dpi = 300,width=14, height=7)
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021", "2020 Reference Case") & prov !="Canada" & sector=="Oil and Gas"))+
-  geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.4)+
+  geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.5,alpha=.6)+
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c("NIR 2021", "2020 Reference Case") & prov !="Canada" & year<=2018 & sector=="Oil and Gas"),
-            aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
+            aes(year,emissions,fill=prov),color="black",position = "stack",size=0.5,alpha=1)+
   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 sector GHGs",width = 20)),linetype=1,size=1.05)+
   #facet_wrap( ~ sector,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
+  scale_x_continuous(breaks=pretty_breaks(n=10))+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
   theme_minimal()+theme(
-    legend.position = "right",
+    legend.position = "bottom",
     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
     legend.text = element_text(colour="black", size = 12),
     plot.caption = element_text(size = 10, face = "italic",hjust=0),
@@ -1891,15 +1906,18 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021", "2020 Reference
     axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
     strip.text.x = element_text(size = 12, colour = "black", angle = 0),
     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+    panel.background = element_rect(fill = "transparent", colour = NA)
   )+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions from Oil and Gas",
-       subtitle=paste("2021 National Inventory (1990-2019) levels and 2020 Reference Case projections (2019-2030)",sep=""),
-       caption=str_wrap("Source: Environment and Climate Change Canada (2021). Reference Case projections include policies and measures that were in place as of September 2019. Graph by @andrew_leach.",width = 180))
-ggsave("oil_gas_proj.png",dpi = 300,width=14, height=7)
+       title="Canadian Oil and Gas Inventory GHG Emissions (1990-2019) and Projections (2020-2030)",
+       #subtitle=paste("2021 National Inventory (1990-2019) levels and 2020 Reference Case projections (2019-2030)",sep=""),
+       caption=str_wrap("Source: Environment and Climate Change Canada (2021). Reference Case projections include policies and measures that were in place as of September 2019. Graph by Andrew Leach.",width = 180))
+ggsave("images/oil_gas_proj.png",width=14, height=7, bg = "transparent",dpi=300)
+ggsave("images/oil_gas_proj.jpg",width=14, height=7, bg = "transparent")
 
 
 
+proj_data %>% filter(sector=="Oil and Gas", year==2030, scenario=="2020 Reference Case")%>% group_by(scenario)%>% summarize(ghgs=sum(emissions))
 
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canada"))+
@@ -3356,22 +3374,25 @@ ipcc_main_sectors<-c("Total","Stationary Combustion Sources","Transport","Fugiti
 
 #making air travel graph
 
-air_graph<-ipcc_nir %>% pivot_wider(names_from = "sector",values_from = GHGs,values_fill=0)%>%
-  mutate(other_transport=transport-aviation)%>% select(c(year,prov,tolower(ipcc_main_sectors),other_transport,aviation))%>%
-  select(-transport)%>%pivot_longer(-c(year,prov),names_to = "sector",values_to = "GHGs")%>%
+sector_graph<-ipcc_nir %>% pivot_wider(names_from = "sector",values_from = GHGs,values_fill=0)%>% #clean_names() %>%
+  mutate(other_transport=transport-aviation,
+         other_stationary=`stationary combustion sources`-`oil and natural gas`)%>% select(c(year,prov,tolower(ipcc_main_sectors),other_stationary,`oil and natural gas`))%>%
+  select(-`stationary combustion sources`)%>%
+  pivot_longer(-c(year,prov),names_to = "sector",values_to = "GHGs")%>%
   mutate(sector=factor(str_to_title(gsub("_"," ",(sector)))),
          sector=fct_reorder(sector,-GHGs),
-         sector=fct_relevel(sector,"Other Transport",after = 0),
-         sector=fct_relevel(sector,"Aviation",after = 0),
-         sector=fct_recode(sector,"Stationary Sources"="Stationary Combustion Sources",
-                           "Industrial P&P"="Industrial Processes And Product Use"
+         sector=fct_relevel(sector,"Other Stationary",after = 0),
+         sector=fct_relevel(sector,"Oil And Natural Gas",after = 0),
+         sector=fct_recode(sector,"Other Stationary Sources"="Other Stationary",
+                           "Industrial P&P"="Industrial Processes And Product Use",
+                           "Oil And Natural Gas Extraction"="Oil And Natural Gas"
                            ),
          NULL
          )
          
 
 
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
+ggplot(filter(sector_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
   geom_area(aes(year,GHGs/10^3,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
   facet_wrap( ~ prov,nrow = 1)+
@@ -3383,9 +3404,9 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
   geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
   theme_tufte()+theme(
-    legend.position = "right",
+    legend.position = "bottom",
     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
     legend.text = element_text(colour="black", size = 12),
     plot.caption = element_text(size = 10, face = "italic",hjust=0),
@@ -3405,12 +3426,13 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
        caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("inventory_ipcc_prov.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_ipcc_prov.png",dpi = 300,width=14, height=7)
 
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
-  geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
+
+ggplot(filter(sector_graph,GHGs>0 & prov =="Canada",sector!="Total"))+
+  geom_area(aes(year,GHGs/10^3,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  facet_wrap( ~ sector,nrow = 1)+
+  #facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
@@ -3419,9 +3441,9 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
   geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
   theme_tufte()+theme(
-    legend.position = "right",
+    legend.position = "bottom",
     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
     legend.text = element_text(colour="black", size = 12),
     plot.caption = element_text(size = 10, face = "italic",hjust=0),
@@ -3436,47 +3458,11 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
   )+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by IPCC Sectors",
+       title="Canadian GHG Emissions by Province (IPCC Sectors)",
        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("inventory_ipcc_sector.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_ipcc.png",dpi = 300,width=14, height=7)
 
 
-
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector=="Aviation"))+
-  geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  #facet_wrap( ~ sector,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_tufte()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    #panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 8, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian Aviation Emissions (IPCC Definition)",
-       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
-       caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-ggsave("inventory_aviation_sector.png",dpi = 300,width=14, height=7)
