@@ -3458,7 +3458,7 @@ ggplot(filter(sector_graph,GHGs>0 & prov =="Canada",sector!="Total"))+
     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
   )+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Province (IPCC Sectors)",
+       title="Canadian GHG Emissions (IPCC Sectors)",
        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
        NULL
