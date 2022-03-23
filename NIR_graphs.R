@@ -860,6 +860,44 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canad
   )
 ggsave("images/inventory_provs.png",dpi = 600,width=14, height=7)
 
+ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canada"))+
+  geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.5,alpha=.6)+
+  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+  facet_wrap( ~ prov,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  scale_y_continuous(breaks=pretty_breaks(n=5))+
+  
+  scale_fill_viridis("",discrete=TRUE,option="B")+
+  
+  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.85,end=0.01)+
+  scale_colour_manual("",values="black",guide = "legend")+
+  geom_hline(aes(yintercept=0))+
+  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_tufte()+theme(
+    legend.position = c(.95, .7),
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+       #title="Canadian GHG Emissions by Province as of 2015",
+       #subtitle=paste("2021 National Inventory (1990-2015)",sep=""),
+       #caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
+       NULL
+  )
+ggsave("images/inventory_provs_2015.png",dpi = 600,width=14, height=7)
+
+
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canada"))+
   geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
@@ -896,6 +934,44 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canad
        NULL
   )
 ggsave("images/inventory_sector.png",dpi = 300,width=14, height=7)
+
+
+ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canada"))+
+  geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
+  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+  facet_wrap( ~ sector,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="E")+
+  scale_fill_viridis("",discrete=TRUE,option="B")+
+  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+  scale_colour_manual("",values="black",guide = "legend")+
+  geom_hline(aes(yintercept=0))+
+  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_tufte()+theme(
+    legend.position = "right",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+       #title="Canadian GHG Emissions by Sector",
+       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+       #caption=str_wrap("Source: Environment and Climate Change Canada 2021 National Inventory (1990-2019). Graph by @andrew_leach.",width = 180),
+       NULL
+  )
+ggsave("images/inventory_sector_2015.png",dpi = 300,width=14, height=7)
+
 
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2021") & prov !="Canada" & sector=="Electricity"))+
@@ -977,6 +1053,48 @@ proj_data %>% left_join(pop_data %>%
        NULL
   )
 ggsave("images/inventory_per_capita.png",dpi = 300,width=14, height=7)
+
+
+proj_data %>% left_join(pop_data %>% 
+                          group_by(Code)%>%
+                          mutate(pop_2005=sum(Prov_pop*(Year=="2005")))%>%ungroup()%>%
+                          mutate(Code=as_factor(Code),Year=as.double(Year)) %>% rename(year=Year,prov=Code))%>%
+  filter(scenario%in% c("NIR 2021") & prov !="Canada",year<2016)%>%
+  ggplot()+
+  geom_area(aes(year,emissions/Prov_pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
+  geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
+  facet_wrap( ~ prov,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="E")+
+  scale_fill_viridis("",discrete=TRUE,option="B")+
+  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+  scale_colour_manual("",values="black",guide = "legend")+
+  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_tufte()+theme(
+    legend.position = "right",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(tCO'[2]*'e per capita)'),
+       #title="Canadian GHG Emissions Per Capita by Province",
+       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+       #caption=str_wrap("Source: Population via Statistics Canada, emissions via Environment and Climate Change Canada 2020 National Inventory (1990-2018). Graph by @andrew_leach.",width = 180)
+       NULL
+  )
+ggsave("images/inventory_per_capita_2015.png",dpi = 300,width=14, height=7)
+
 
 
 
@@ -1183,6 +1301,50 @@ targets_graph+ annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Proj
 ggsave("images/emissions_and_targets_oil.png",dpi=300,width=13,height=6)
 
 
+
+
+plot_2016<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scenario!="2019 Reference Case",
+                                                                 scenario!="2018 Reference Case",
+                                                                 scenario!="2017 Reference Case",
+                                                                 scenario!="2020 Reference Case"),aes(x=year))+
+  geom_line(data=filter(cdn_data,grepl('2016', scenario)),aes(year,emissions,lty=scenario),color="orange",size=2)+
+  geom_line(data=filter(cdn_data,grepl('National Inventory', scenario),year<2016),aes(year,emissions,lty=scenario),color="black",size=2)+
+  scale_linetype_manual("",values=c("11","solid","11"))+
+  geom_point(data=targets%>%filter(Year<2050),aes(Year,target),size=5,colour=palette[9])+
+  geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
+  scale_color_manual("",values=palette[-1])+
+  annotate("text",x=1990+(2019-1990)/2,y=790,label="National Inventory Emissions (1990-2019)",
+           color="black",fontface="bold",hjust=0.5)+
+  #Rio
+  annotate("text",x=2001,y=603.22,label="Rio Target (return to 1990 levels by 2000)",
+           colour=palette[9],fontface="bold",hjust=0)+
+  #kyoto
+  #geom_point(aes(2010,565),size=5,colour=palette[9])+ #kyoto target
+  geom_errorbarh(aes(xmin=2008,y=565,xmax=2012),height=40,size=2,colour=palette[9])+
+  annotate("text",x=2007,y=565,label="Kyoto Target (6% below 1990 levels, 2008-12)",
+           colour=palette[9],fontface="bold",hjust=1)+
+  #copenhagen
+  annotate("text",x=2021,y=607.32,label="Copenhagen Target (17% below 2005 levels by 2020)",
+           colour=palette[9],fontface="bold",hjust=0)+
+  #paris
+  annotate("text",x=2029,y=512.9,label="Paris Target (30% below 2005 levels by 2030)",
+           colour=palette[9],fontface="bold",hjust=1)+
+  #harper 2050
+  #geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
+  geom_errorbar(aes(x=2050,ymax=730*(1-.6),ymin=730*(1-.7)),width=1.4,size=2,colour=palette[9])+
+  annotate("text",x=2049,y=730*(1-.65),label="Harper era 2050 Target (60-70% below 2006 levels by 2050)",
+           colour=palette[9],fontface="bold",hjust=1)+
+  geom_hline(yintercept=0,size=1)+
+
+  scale_y_continuous(limit=c(0,825))+
+  scale_x_continuous(limit=c(1990,2052),breaks=seq(1990,2050,10),expand = c(0,0))+
+  tombe_theme()+theme(legend.position = "none")+
+  labs(x="",y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
+       title="Canada's GHG Emissions, Projections and Future Targets",
+       subtitle="Source: Environment and Climate Change Canada Emissions Inventory (2021) and Projections (2016).")+
+   annotate("text",x=2031,y=815,label="2016 ECCC Reference Case Projection (2016-2030)",color="orange",fontface="bold",hjust=0)
+plot_2016
+ggsave("images/emissions_and_targets_2016.png",dpi=300,width=13,height=6)
 
 #NIR but with IPCC Sectors
 
