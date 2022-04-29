@@ -409,6 +409,20 @@ main_sectors<-c(
   "Construction",
   "Forest Resources")
 
+attn_sectors<-c(
+  "Oil and Gas",        
+  "Electricity",                                         
+  "Transportation",
+  "Heavy Industry",
+  "Buildings",
+  "Agriculture",
+  "Waste"
+  #"Coal Production",
+  #"Light Manufacturing",
+  #"Construction",
+  #"Forest Resources"
+  )
+
 
 prov_ghgs <- NIR_data%>% filter(sector %in% main_sectors)%>%group_by(Prov,Year)%>% summarize(GHGs=sum(GHGs,na.rm = T))
 save(prov_ghgs,file = "data/prov_ghgs.Rdata")
@@ -418,9 +432,18 @@ NIR_natl$Year<-as.numeric(NIR_natl$Year)
 NIR_natl<-merge(filter(NIR_natl,sector %in% main_sectors),pop_data,by.x=c("Prov","Year"),by.y=c("Code","Year"))
 NIR_natl$per_cap<-NIR_natl$GHGs/NIR_natl$Prov_pop
 
+NIR_natl<-NIR_natl %>% mutate(
+  sector=as.factor(sector),
+  sector=fct_other(sector,keep = attn_sectors)
+)%>%group_by(sector,Year,Prov)%>%
+  summarize(Prov_pop=first(Prov_pop),
+            GHGs=sum(GHGs),
+            per_cap=GHGs/Prov_pop)
+
 ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
-  geom_area(aes(Year,GHGs,group=sector,fill=sector))+
-  scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  geom_area(aes(Year,GHGs,group=sector,fill=sector),color="black",size=0.5)+
+  #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
   scale_colour_manual("",values="black",guide = "legend")+
   scale_x_continuous(breaks=pretty_breaks(n=16), expand = c(0,0))+
   guides(fill=guide_legend(nrow =2,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
