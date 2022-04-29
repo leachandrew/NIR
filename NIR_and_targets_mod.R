@@ -15,8 +15,12 @@ get_new_nir<-function() {
   #download.file("http://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2020.csv",mode="wb")
   #nir_2021<-read.csv("canada_ghg_2021_orig.csv",stringsAsFactors = F)
   
-  download.file("http://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2021_dl.csv",mode="wb")
-  nir_2021<-read.csv("canada_ghg_2021_dl.csv",stringsAsFactors = F)
+  #download.file("http://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2021_dl.csv",mode="wb")
+  #nir_2021<-read.csv("canada_ghg_2021_dl.csv",stringsAsFactors = F)
+  
+  download.file("https://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/B-Economic-Sector/GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2022_dl.csv",mode="wb")
+  nir_2022<-read.csv("canada_ghg_2022_dl.csv",stringsAsFactors = F)
+  
   main_sectors<-c(
     "Oil and Gas",        
     "Electricity",                                         
@@ -30,7 +34,7 @@ get_new_nir<-function() {
     "Construction",
     "Forest Resources")
   
-  new_nir<-nir_2021 %>% 
+  new_nir<-nir_2022 %>% 
     rename(Sector=Category,Sub.sector=Sub.category,Sub.sub.sector=Sub.sub.category)%>%
     mutate(Prov=as.factor(Region),
                                Prov=fct_recode(Prov,"AB"="Alberta",
@@ -51,15 +55,17 @@ get_new_nir<-function() {
                                                  "TERR" = c("NT", "NU","YT","NT & NU"),
                                                 "ATL" = c("NL", "NB","NS","PE")),
                                #need to collapse new subsector structure
-                               sector=Sub.sub.sector,
-                               sector=ifelse(sector=="",Sub.sector,sector),
-                               sector=ifelse(sector=="",Sector,sector),
-                               sector=ifelse(sector=="",Source,sector),
+                               sector=case_when(
+                                 (Sector!="")&(Sub.sector=="")&(Sub.sub.sector=="") ~ Sector, #both subs are blank
+                                 (Sub.sector!="")&(Sub.sub.sector=="") ~ Sub.sector, #just sub.sub is blank
+                                 (Sub.sub.sector!="") ~ Sub.sub.sector, #sub.sub exists
+                                 (Sector=="") ~ Source
+                                 ),
                                #fix territories inventory
                                NULL)%>%
     mutate(sector=factor(sector),
           sector=fct_collapse(sector,"Inventory Total"=
-                c("Territories Inventory Total","Territory Inventory Total","Provincial Inventory Total"))
+                c("Territories Inventory Total","Territory Inventory Total","Territorial Inventory Total","Provincial Inventory Total"))
            )%>%
     group_by(Year, Prov,sector) %>% summarize(GHGs=sum(as.numeric(CO2eq),na.rm = T)) %>% ungroup()%>%
     select(sector,Prov,Year,GHGs)%>%#filter(!is.na(GHGs))%>%
