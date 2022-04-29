@@ -7,6 +7,13 @@ Slicing Canada's emissions inventory by economic sector and province shows a sur
 
 Adding projections from ECCC shows where we expect emissions trends to take us:
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/sector_proj.png" target="_blank">
   <img border="0" align="center"  src="images/sector_proj.png"/>
+</a>
+
+
+And, the oil and gas sector, which gets the most attention for its emissions, is isolated in the image below:
+
+<a href="images/nir_oil.png" target="_blank">
+  <img border="0" align="center"  src="images/nir_oil.png"/>
 </a>
