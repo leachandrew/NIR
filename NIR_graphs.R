@@ -468,6 +468,42 @@ ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
 ggsave("images/nir_natl.png",width=16,height=9,dpi=300)
 
 
+ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
+  geom_area(aes(Year,per_cap*10^6,group=sector,fill=sector),color="black",size=0.5)+
+  #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  #annotate("rect", fill = "black", 
+  #         xmin = 2008+3/12, xmax =2008+4/12,
+  #         ymin = -Inf, ymax = 23) +
+  #annotate("text", x = 2008+3.5/12, y = 24.5, label = "Turning the Corner Plan\nIntroduced",size=4)+
+  #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  
+  scale_colour_manual("",values="black",guide = "legend")+
+  scale_x_continuous()+
+  guides(fill=guide_legend(nrow =2,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_minimal()+theme(
+    legend.position = "bottom",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 8),
+    plot.caption = element_text(size = 8, face = "italic"),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 20, face = "italic"),
+    panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 14,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", angle = 90),
+    strip.text.x = element_text(size = 10, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 10,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Per-Capita Emissions  '*'(tonnes CO'[2]*'e per person)'),
+       title="Canadian Per Capita GHG Emissions by Sector, 1990-2020",
+       #subtitle="According to Ian Brodie, they first declined after March, 2008.",
+       caption="Source: Environment Canada National Inventory Data, graph by @andrew_leach")
+ggsave("images/natl_per_cap.png",height = 9,width = 16,dpi=300)
+
+
+
 
 oil_sectors<-c("Conventional Heavy Oil Production","Conventional Light Oil Production","Frontier Oil Production",
                "Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
@@ -496,69 +532,28 @@ ggsave("images/nir_oil.png",width=16,height=9,dpi=300)
 
 
 
-ggplot(filter(new_nir,Prov=="AB",sector%in%oil_sectors))+
-  geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack")+
-  scale_fill_manual("",values = colors_tableau10(),guide = "legend")+
-  scale_colour_manual("",values="black",guide = "legend")+
+nir_oil_ab<-ggplot(new_nir %>% filter(Prov=="AB",sector%in%oil_sectors)%>%
+                  mutate(sector=as_factor(sector),
+                         sector=fct_relevel(sector,"Conventional Light Oil Production")))+
+  geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
+  #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
   scale_x_continuous(breaks=pretty_breaks(n=15), expand = c(0,0))+
   scale_y_continuous(breaks=pretty_breaks(n=5), expand = c(0,0))+
-  guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =2,byrow=FALSE))+
-  theme_minimal()+theme(
-    legend.position = "bottom",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0.5,vjust=0.5),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual GHG Emissions  '*'(Mt CO'[2]*'e)'),
-       #title="Canadian GHG Emissions from Crude Oil and Oil Sands Production, 1990-2017",
-       #subtitle="According to Ian Brodie, they first declined after March, 2008.",
-       #caption="Source: Environment aCanada National Inventory Data, graph by @andrew_leach"
-       NULL
-  )
+  guides(fill=guide_legend(nrow =2,byrow=TRUE))+
+  theme_minimal()+slide_theme()+
+  labs(x=NULL,y=expression('Annual GHG Emissions  '*'(Mt CO'[2]*'e)'))
+nir_oil_ab
+ggsave("images/nir_oil_ab_raw.png",width=16,height=9,dpi=300)
+
+nir_oil_ab+labs(title="GHG Emissions from Crude Oil and Oil Sands Production in Alberta, 1990-2020",
+             #subtitle="According to Ian Brodie, they first declined after March, 2008.",
+             caption="Source: Environment Canada National Inventory Data, graph by @andrew_leach")
 ggsave("images/nir_AB_oil_gas.png",width=12,height=5,dpi=300)
 
 
-ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
-  geom_area(aes(Year,per_cap*10^6,group=sector,fill=sector))+
-  annotate("rect", fill = "black", 
-           xmin = 2008+3/12, xmax =2008+4/12,
-           ymin = -Inf, ymax = 23) +
-  annotate("text", x = 2008+3.5/12, y = 24.5, label = "Turning the Corner Plan\nIntroduced",size=4)+
-  scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_colour_manual("",values="black",guide = "legend")+
-  scale_x_continuous()+
-  guides(fill=guide_legend(nrow =2,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_minimal()+theme(
-    legend.position = "bottom",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 8),
-    plot.caption = element_text(size = 8, face = "italic"),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size = 20, face = "italic"),
-    panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 14,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90),
-    strip.text.x = element_text(size = 10, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 10,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Per-Capita Emissions  '*'(tonnes CO'[2]*'e per person)'),
-       title="Canadian Per Capita GHG Emissions, 1990-2018",
-       subtitle="According to Ian Brodie, they first declined after March, 2008.",
-       caption="Source: Environment Canada National Inventory Data, graph by @andrew_leach")
-ggsave("images/natl_per_cap.png",height = 9,width = 16,dpi=300)
 
 
 #find the largest sectors
