@@ -1,0 +1,33 @@
+Electricity Generation/Production d'électricité ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Activity (English) / Activité (anglais),Activity (French) / Activité (français),Category (English) / Catégorie (anglais),Category (French) / Catégorie (français),Fuel (English) / Carburant (anglais),Fuel (French) / Carburant (français),Units (English) / Unités (anglais),Units (French) / Unités (français),2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030
+Generating Capacity,Capacité de production,Industry,Industrie,Coal/Coke,Charbon/Coke,GW,GW,x,x,x,x,x,x,x,x,x,x,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Generating Capacity,Capacité de production,Industry,Industrie,Coke Oven Gas,Gaz Naturel,GW,GW,x,x,x,x,x,x,x,x,x,x,0.1,0.1,0.1,0,0,0,0,0,0,0,0.1,0.1,0.1,0.1,0.2,0.2
+Generating Capacity,Capacité de production,Industry,Industrie,Natural Gas,Gaz Naturel,GW,GW,x,x,x,x,x,x,x,x,x,x,8.1,8,8.3,8.2,8.3,8.3,8.7,9.1,9.2,9.2,10.1,10.2,10.2,10.3,10.3,10.4
+Generating Capacity,Capacité de production,Industry,Industrie,Refined Petroleum Products,Produits Pétroliers Raffinés,GW,GW,0.5,0.6,0.6,0.6,0.6,0.9,0.8,0.6,0.6,0.8,0.8,0.6,0.6,0.5,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4
+Generating Capacity,Capacité de production,Industry,Industrie,Renewables,Énergie renouvelable,GW,GW,6.6,6.5,6.4,6.3,6.3,6.3,6.2,6.4,6.5,6.6,6.8,6.7,6.7,6.9,6.9,6.9,6.9,7,7.1,7.2,7.3,7.5,7.6,7.8,7.9,8.1
+Generating Capacity,Capacité de production,Utilities,Services publics,Coal/Coke,Charbon/Coke,GW,GW,x,x,x,x,x,x,x,x,x,x,9.5,9.5,9.5,8.9,7.9,7.6,7.2,4.5,3.5,2.7,2.5,2.5,2.5,2.2,2,0.1
+Generating Capacity,Capacité de production,Utilities,Services publics,Natural Gas,Gaz Naturel,GW,GW,x,x,x,x,x,x,x,x,x,x,14.5,13.5,11.6,13.7,13.9,15.4,17.5,17.8,17.2,18.2,18.1,18.1,18.3,18.3,18.6,20.2
+Generating Capacity,Capacité de production,Utilities,Services publics,Nuclear,Nucléaire,GW,GW,13.3,13.3,13.3,13.3,13.3,13.3,13.3,14.9,14.2,14.2,14.2,14.2,14.2,14.2,14.2,14.2,14.2,14.2,14.2,14.1,13.2,11,11,11.3,11.3,11.3
+Generating Capacity,Capacité de production,Utilities,Services publics,Refined Petroleum Products,Produits Pétroliers Raffinés,GW,GW,6.6,5.4,5.6,7.6,8.2,5.4,4.7,4.6,4,4,3.9,4.2,6.3,4.1,4.1,4.1,3.7,3.5,3.5,3.5,3.5,3.5,3.5,3.5,3.5,3.3
+Generating Capacity,Capacité de production,Utilities,Services publics,Renewables,Énergie renouvelable,GW,GW,70.1,71.2,72.4,73.2,74,74.9,76.9,79.1,80.7,83.7,87.5,89.6,90.1,90.9,91.4,93.5,95.9,100.7,101.6,102.7,104.9,107.9,111.6,115.6,119.8,123.5
+Generation,Production,Industry,Industrie,Coke Oven Gas,Gaz Naturel,TWh,TWh,x,x,x,x,x,x,x,x,x,x,0,0,0,0,0.1,0.1,0.1,0.1,0.1,0.2,0.3,0.5,0.6,0.8,0.9,1
+Generation,Production,Industry,Industrie,Natural Gas,Gaz Naturel,TWh,TWh,x,x,x,x,x,x,x,x,x,x,35.8,30.5,31.2,32,30.1,31.2,33.7,36.7,37.3,37.6,43.9,44.2,44.5,44.8,45.1,45.5
+Generation,Production,Industry,Industrie,Refined Petroleum Products,Produits Pétroliers Raffinés,TWh,TWh,1.9,2.3,2,1.8,2,1.8,2.6,2.2,2.1,2.3,2.2,2.1,1.6,0.8,0.7,0.9,1,1.1,1,1,0.8,0.8,0.8,0.8,0.8,0.7
+Generation,Production,Industry,Industrie,Renewables,Énergie renouvelable,TWh,TWh,38,39.2,33.5,36.5,34.8,30.6,34.5,37.1,36.1,37,38.6,35.3,35.8,37.9,36.6,36.4,36.5,36.7,37.3,38.1,38.7,39.7,40.6,41.7,42.7,43.9
+Generation,Production,Utilities,Services publics,Coal/Coke,Charbon/Coke,TWh,TWh,x,x,x,x,x,x,x,x,x,x,59.5,58,57.5,47.6,45.3,33,26.5,16,10.4,6.7,6.8,6.5,5.9,5.6,5.4,0.9
+Generation,Production,Utilities,Services publics,Natural Gas,Gaz Naturel,TWh,TWh,x,x,x,x,x,x,x,x,x,x,31.4,30.5,28.7,35.7,39.3,46.8,51.1,65.7,66.1,72.3,70.5,80.4,76.6,68.5,67.3,71.7
+Generation,Production,Utilities,Services publics,Nuclear,Nucléaire,TWh,TWh,86.8,92.3,88.1,90.4,84.8,85.2,87.9,89,97,100.4,95,95.6,96.5,95.8,98.3,84.6,81.9,76.4,78.5,74.6,69.5,59.4,62.4,67.3,68.1,67.3
+Generation,Production,Utilities,Services publics,Refined Petroleum Products,Produits Pétroliers Raffinés,TWh,TWh,14.5,9.4,10.6,8.7,9.2,6.1,5.2,5.2,5.6,7,6.9,6.4,6.3,5.9,5.2,4.5,3.9,3.2,3.3,3.3,3.3,3.1,3.1,3.1,3,0.8
+Generation,Production,Utilities,Services publics,Renewables,Énergie renouvelable,TWh,TWh,334.3,326.2,347.3,355.2,349.1,339.3,363.3,368.6,386,380.8,383.7,398.5,405.1,397.8,399.2,409.9,417.5,429.1,437.1,443,460,471.5,482.1,491.4,499.9,511.9
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Notes:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"""x"" indicates content suppressed in order to meet the confidentiality requirements of the Statistics Act.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"""0"" Indicates data truncated due to rounding.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+-: no data.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Nota:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"""x"" indique que le contenu a été supprimé afin de respecter les exigences de confidentialité de la Loi sur la statistique.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"""0"" Indique que les données ont été tronquées, parce qu’elles ont été arrondies.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+-: aucune données.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

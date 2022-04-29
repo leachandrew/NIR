@@ -1,0 +1,23 @@
+Energy Intensity by Enduse/Intensité énergétique par utilisation finale 
+"End Use (English) / Utilisation finale (anglais)","End Use (French) / Utilisation finale (français)","Units (English) / Unités (anglais)","Units (French) / Unités (français)","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030"
+"Air Conditioning","Climatisation","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","3.02","2.26","2.31","1.7","1.36","2.52","2.5","2.77","2.01","1.85","2.17","2.55","2.09","2.71","2.68","3.45","2.95","2.89","2.81","2.73","2.65","2.57","2.5","2.43","2.37","2.31"
+"Lighting","Éclairage","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","5.03","4.92","4.79","4.84","4.77","4.69","4.63","4.61","4.56","4.42","4.12","3.78","3.81","3.63","3.55","3.5","3.45","3.38","3.31","3.25","3.18","3.13","3.08","3.03","2.98","2.93"
+"Other Non-Substitutables","Autres non-substituables","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","5.75","5.89","6.02","6.28","6.38","6.51","6.71","6.96","7.2","7.21","6.91","6.58","6.82","6.79","6.65","6.82","6.96","7.01","7.04","7.06","7.07","7.08","7.16","7.23","7.28","7.34"
+"Other Substitutables","Autres substituables","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","5.9","5.86","5.86","5.89","5.77","5.62","5.61","5.6","5.63","5.54","5.31","5.04","5.09","4.94","4.84","4.8","4.76","4.66","4.57","4.49","4.4","4.32","4.3","4.27","4.24","4.22"
+"Refrigeration","Réfrigération","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","4.22","4.05","3.9","3.81","3.64","3.41","3.27","3.23","3.21","3.13","2.92","2.71","2.75","2.66","2.61","2.55","2.51","2.44","2.38","2.33","2.27","2.22","2.18","2.14","2.1","2.07"
+"Space Heating","Chauffage des locaux","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","75.8","70.84","79.24","79.12","76.6","69.32","74.01","67.62","72.57","73.74","69.66","65.45","68.15","70.06","68.58","62.05","61.07","58.79","56.69","54.74","52.91","51.25","49.78","48.41","47.14","46.01"
+"Water Heating","Chauffage de l'eau","Gigajoules/Occupied dwellings","Gigajoules/Logements occupés","22.41","22.15","22.46","21.85","20.92","20.43","21.22","20.64","20.19","19.23","19.21","18.72","19.07","19","18.61","18.67","18.64","18.31","18.03","17.79","17.59","17.4","17.52","17.62","17.7","17.76"
+
+
+"Notes:"
+"Electric and Steam values in some tables are reported as gross and net energy demands for electricity, and gross and net sales for steam. Please be advised that summing all the columns to produce total values will include double-counting of some energy demands."
+"""x"" indicates content suppressed in order to meet the confidentiality requirements of the Statistics Act."
+"""0"" Indicates data truncated due to rounding."
+"-: no data."
+""
+""
+"Nota:"
+"Les valeurs d'électricité et de vapeur dans certains tableaux sont rapportées à la fois en demandes électriques nettes et en demandes électriques brutes. Veuillez noter que la somme de toutes les colonnes pour produire des valeurs totales inclut le double comptage de certaines demandes d'énergie."
+"""x"" indique que le contenu a été supprimé afin de respecter les exigences de confidentialité de la Loi sur la statistique."
+"""0"" Indique que les données ont été tronquées, parce qu’elles ont été arrondies."
+"-: aucune données."

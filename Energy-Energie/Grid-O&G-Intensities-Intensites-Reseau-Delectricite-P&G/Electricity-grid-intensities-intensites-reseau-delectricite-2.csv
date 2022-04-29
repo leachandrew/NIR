@@ -1,0 +1,33 @@
+Electric Grid Intensity, by Province (including Biomass & RNG CO2 emissions)/Intensité du réseau électrique par province (incluant les émissions de CO2 provenant de la biomasse et du gaz naturel renouvelable) 
+"Region (English) / Région (anglais)","Region (French) / Région (français)","Units (English) / Unités (anglais)","Units (French) / Unités (français)","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030"
+"Alberta","Alberta","t CO2e/GWh","t d'éq CO2/GWh",955.6,943.7,922.3,894.7,823,827.2,781.9,729.1,755.9,778.2,788.9,713.1,705.3,553.7,532.7,516.7,446.3,356.9,249.8,232,210.7,225,223,216.8,207.6,206.9
+"British Columbia","Colombie-Britannique","t CO2e/GWh","t d'éq CO2/GWh",48.4,42.3,34.7,40.1,32.8,41,26.9,20.6,23.5,19.4,17.3,21.2,20.3,18.7,23,21.2,19.7,21.2,19.2,21.9,16.5,19.4,20.9,16,9.8,9.6
+"Manitoba","Manitoba","t CO2e/GWh","t d'éq CO2/GWh",19.2,23.6,26.2,20.7,9.5,4.4,5.8,5.3,5.4,5.6,5.6,3.2,3.1,1.8,1.8,0.9,0.9,0.5,0.5,0.5,0.5,0.5,0.5,0.6,0.6,0.6
+"New Brunswick","Nouveau-Brunswick","t CO2e/GWh","t d'éq CO2/GWh",589.3,605.2,552.9,563.5,555.3,412.3,367.5,297.3,292.4,276.9,277,299.7,225.8,243.3,218.9,278.2,261.7,271.8,270.1,277.1,275,276.8,274.3,260,254.2,126.1
+"Newfoundland and Labrador","Terre-Neuve-et-Labrador","t CO2e/GWh","t d'éq CO2/GWh",85.6,64.4,106,85.6,84.8,74.4,83.9,79.3,85.9,120,136.8,151.4,144.9,106.6,105.7,90.5,68.1,12.3,11.9,11.5,11.2,11,10.8,10.6,10.4,10.4
+"Northwest Territory","Territoires du Nord-Ouest","t CO2e/GWh","t d'éq CO2/GWh",314.5,280.8,302.7,272.6,206.3,224.4,221.1,184,173.1,222.1,329.4,185.8,167.9,187.5,200.4,57.6,67.1,61.5,50.8,16.7,8.4,8,8,10.2,12.2,14.2
+"Nova Scotia","Nouvelle-Écosse","t CO2e/GWh","t d'éq CO2/GWh",967.3,1022.2,999.2,882.6,879.5,767.1,772,752.9,741.6,724.3,687,658.5,671.8,697.3,641.3,634.1,562.4,458.4,456.5,462.8,463.6,417.4,401.1,383.8,360.7,117.5
+"Nunavut","Nunavut","t CO2e/GWh","t d'éq CO2/GWh",604.5,506.3,508.8,537.9,565.4,565.4,480.8,482.6,452.4,566.1,480.8,606.2,573.6,673.9,674.6,747.2,743.8,744.3,711.9,635.3,497.9,480.2,468.8,470.1,454.6,456.5
+"Ontario","Ontario","t CO2e/GWh","t d'éq CO2/GWh",239.1,216.5,238.3,198.4,124.4,146.9,98.5,99.4,66.6,36,45.6,43.6,19.5,28.1,26,34.3,44.8,67.2,65.9,66.7,77.6,93.4,81.2,67.3,64.8,62.3
+"Prince Edward Island","Île-du-Prince-Édouard","t CO2e/GWh","t d'éq CO2/GWh",4.3,2.9,3.5,3.4,4.7,1.3,0.8,8.7,3,3.3,10.9,3.1,3.2,1.9,0.7,0.8,0.8,0.8,0.8,0.8,0.7,0.7,0.9,0.7,0.7,0.9
+"Quebec","Québec","t CO2e/GWh","t d'éq CO2/GWh",3,2.5,2.7,2.4,2.5,2.3,2.6,1.8,0.8,0.9,0.6,0.8,0.8,0.8,5.8,5.3,5.2,5.1,5.3,5.3,4.9,4.8,4.8,4.7,4.6,4.6
+"Saskatchewan","Saskatchewan","t CO2e/GWh","t d'éq CO2/GWh",839.3,802.6,791.6,753.6,844.5,818.7,770,771.5,664.1,672.8,720.3,700.5,681.9,698.3,688.9,410,367.5,300.5,306.6,253,250.4,254.4,222.1,174.1,168,164.3
+"Yukon Territory","Yukon","t CO2e/GWh","t d'éq CO2/GWh",69.8,53.2,53,51,44.4,48.3,68.4,42.6,41.2,41.3,44.5,46.9,53,74.9,110,44.6,120.6,68.2,76.9,85.7,88.7,99.3,74.1,46.1,28.7,18.4
+
+
+"Notes:"
+"The electricity grid intensities are calculated from Canada’s greenhouse gas and air pollutant emissions projections 2021 (https://publications.gc.ca/site/fra/9.866115/publication.html)."
+"The electricity grid intensities are computed by dividing electricity emissions by electricity sales from the utility grid within a province or territory. Electricity emissions are the sum of emissions from utility electricity production and emissions from industrial electricity sold to the utility grid (including emissions from electricity losses)."
+"This methodology implies that imports and exports of electricity are assumed to have an emissions intensity of zero while the electricity imported still contributes to the sales of electricity from the utility grid. This also means that emissions from exported electricity are attributed to the exporting province or territory."
+"""x"" indicates content suppressed in order to meet the confidentiality requirements of the Statistics Act."
+"""0"" Indicates data truncated due to rounding."
+"-: no data."
+""
+""
+"Nota:"
+"Les intensités du réseau électrique sont calculées à partir des Projections des émissions de gaz à effet de serre et de polluants atmosphériques au Canada 2021 (https://publications.gc.ca/site/fra/9.866116/publication.html)."
+"Les intensités du réseau électrique sont calculées en divisant les émissions de la production d'électricité par les ventes d'électricité des services publics dans une province ou un territoire. Les émissions de la production d'électricité sont la somme des émissions de la production d'électricité des services publics et des émissions de la production d'électricité industrielle vendue aux services publics (y compris les émissions dues aux pertes d'électricité)."
+"Cette méthodologie implique que les importations et les exportations d'électricité ont une intensité d'émissions nulle tandis que l'électricité importée est inclus dans les ventes d'électricité par les services publics. Cela signifie également que les émissions de l'électricité exportée sont attribuées à la province ou au territoire exportateur."
+"""x"" indique que le contenu a été supprimé afin de respecter les exigences de confidentialité de la Loi sur la statistique."
+"""0"" Indique que les données ont été tronquées, parce qu’elles ont été arrondies."
+"-: aucune données."

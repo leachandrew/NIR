@@ -1,0 +1,16 @@
+Crude Oil Balance/Bilan du pétrole brut 
+"Activity (English) / Activité (anglais)","Activity (French) / Activité (français)","Fuel Groupings (English) / Groupes de carburants (anglais)","Fuel Groupings (French) / Groupes de carburants (français)","Units (English) / Unités (anglais)","Units (French) / Unités (français)","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030"
+"Total Production","Production totale","Crude Oil","Pétrole brut","Petajoules","Pétajoules","6111","6556","6791","6668","6786","7107","7505","8066","8647","9307","9633","9587","10480","11315","11591","11050","11851","12437","12993","13331","13539","13826","14117","14319","14619","14761"
+"Imports","Importations","Crude Oil","Pétrole brut","Petajoules","Pétajoules","1872","1704","1785","1749","1676","1596","1465","1474","1700","1612","1738","1852","1880","1738","1794","2010","1600","1652","1695","1737","1788","1978","1978","1937","1813","1908"
+"Exports","Exportations","Crude Oil","Pétrole brut","Petajoules","Pétajoules","3198","3565","3671","3759","3879","4092","4704","5295","5982","6516","6932","7123","7594","8356","8652","8852","9287","9618","9964","10156","10414","10891","11182","11343","11519","11757"
+"Crude Oil transformed into Refined Petroleum Products","Pétrole brut transformé en produit pétrolier raffiné","Crude Oil","Pétrole brut","Petajoules","Pétajoules","4462","4388","4494","4393","4278","4377","4165","4279","4167","4071","4186","4243","4398","4292","4155","3727","3727","3727","3727","3727","3727","3727","3727","3727","3727","3727"
+"Crude Oil Adjustments","Ajustements pétrole brut","Crude Oil","Pétrole brut","Petajoules","Pétajoules","-323","-307","-410","-265","-305","-234","-101","34","-197","-332","-253","-72","-369","-404","-578","-480","-437","-744","-997","-1185","-1185","-1185","-1185","-1185","-1185","-1185"
+
+
+"Notes:"
+"""Total Production"" does not include production from Oil Sands Upgraders."
+"Crude Oil Adjustments includes stock variation, cyclical billing variations, metering differences, losses in transportation and sales to non-refineries."
+""
+"Nota:"
+"La ""production totale"" ne comprend pas la production des usines de valorisation des sables bitumineux."
+"Les ajustements liés au pétrole brut comprennent la variation des stocks, les variations de facturation cycliques, les différences de mesure, les pertes de transport et les ventes aux raffineries."

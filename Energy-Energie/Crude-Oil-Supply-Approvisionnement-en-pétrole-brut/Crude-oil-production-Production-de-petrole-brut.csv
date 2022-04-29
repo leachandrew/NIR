@@ -1,0 +1,22 @@
+Crude Oil Production/Production du pétrole brut 
+"Activity (English) / Activité (anglais)","Activity (French) / Activité (français)","Category (English) / Catégorie (anglais)","Category (French) / Catégorie (français)","Units (English) / Unités (anglais)","Units (French) / Unités (français)","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030"
+"Oil Production","Production de pétrole","CSS Oil Sands","Sables bitumineux CSS","Petajoules","Pétajoules","507","559","559","554","532","606","660","645","627","603","654","588","611","541","550","533","588","616","638","660","674","688","719","743","780","796"
+"Oil Production","Production de pétrole","Frontier Oil Mining","Extraction de pétrole des régions pionnières","Petajoules","Pétajoules","723","720","863","803","633","650","619","471","537","507","403","490","494","389","369","331","310","340","361","341","325","357","356","319","312","285"
+"Oil Production","Production de pétrole","Heavy Oil Mining","Extraction de pétrole lourd","Petajoules","Pétajoules","1247","1226","1187","1107","1031","1007","1016","1074","1082","1096","1021","957","959","1102","1221","1136","1203","1339","1488","1548","1551","1532","1505","1476","1451","1461"
+"Oil Production","Production de pétrole","Light Oil Mining","Extraction de pétrole léger","Petajoules","Pétajoules","1142","1132","1123","1177","1117","1144","1242","1450","1533","1593","1462","1269","1319","1430","1417","1284","1308","1365","1476","1523","1550","1584","1628","1680","1722","1723"
+"Oil Production","Production de pétrole","Oil Sands Mining","Extraction des sables bitumineux","Petajoules","Pétajoules","1559","1890","1949","1794","2050","2129","2218","2317","2425","2578","2886","2857","3170","3657","3854","3693","4003","4123","4192","4250","4285","4360","4382","4405","4406","4407"
+"Oil Production","Production de pétrole","Oil Sands Upgraders","Valorisation des sables bitumineux","Petajoules","Pétajoules","1402","1666","1712","1661","1920","1967","2105","2245","2292","2349","2392","2297","2508","2595","2720","2610","2902","2902","2902","2921","2987","3030","3052","3087","3106","3096"
+"Oil Production","Production de pétrole","Primary Oil Sands","Sables bitumineux primaires","Petajoules","Pétajoules","372","394","453","463","505","483","525","610","683","719","650","549","530","465","429","416","461","481","497","513","524","534","556","573","600","611"
+"Oil Production","Production de pétrole","SAGD Oil Sands","Sables bitumineux DGMV","Petajoules","Pétajoules","208","272","306","433","604","789","932","1210","1445","1826","2094","2318","2730","2896","2862","2771","3056","3184","3317","3439","3528","3624","3800","3941","4153","4252"
+"Condensates Production","Production de condensats","n/a","s/o","Petajoules","Pétajoules","53","55","59","63","53","94","101","110","134","195","270","369","474","635","703","713","745","802","833","863","900","936","958","968","981","1007"
+"Pentanes Plus Production","Production de pentanes plus","n/a","s/o","Petajoules","Pétajoules","300","308","292","275","262","203","191","180","181","190","193","189","193","199","187","174","178","187","191","195","203","211","215","214","215","219"
+"Total Production","Production Totale","n/a","s/o","Petajoules","Pétajoules","6111","6556","6791","6668","6786","7107","7505","8066","8647","9307","9633","9587","10480","11315","11591","11050","11851","12437","12993","13331","13539","13826","14117","14319","14619","14761"
+
+
+"Notes:"
+"""Total Production"" does not include production from Oil Sands Upgraders."
+"Crude Oil Adjustments includes stock variation, cyclical billing variations, metering differences, losses in transportation and sales to non-refineries."
+""
+"Nota:"
+"La ""production totale"" ne comprend pas la production des usines de valorisation des sables bitumineux."
+"Les ajustements liés au pétrole brut comprennent la variation des stocks, les variations de facturation cycliques, les différences de mesure, les pertes de transport et les ventes aux raffineries."
