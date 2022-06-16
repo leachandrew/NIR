@@ -2364,14 +2364,15 @@ agg_proj_data$prov<-factor(agg_proj_data$prov,levels = (c("Canada","BC","AB","SK
 
 
 #figure out last 5 years pro-rata by prov
-year_5 <- proj_data %>% filter(scenario=="NIR 2019",year%in%c(2014,2015,2016,2017,2018))%>% 
+year_5 <- proj_data %>% filter(scenario=="NIR 2022",year%in%c(2016,2017,2018,2019,2020))%>% 
   group_by(prov,scenario) %>% 
   summarize(last5=sum(emissions)/5)%>% 
   ungroup()%>%
-  mutate(share=last5/sum(last5*(prov=="Canada"))*511)
+  mutate(share=last5/sum(last5)*511)
 
 #figure out last 5 years pro-rata by prov
 year_2030 <- proj_data %>% filter(year%in%c(2030))%>% 
+  filter(scenario=="2021 Reference Case")%>%
   group_by(prov,scenario) %>% 
   summarize(emissions=sum(emissions))%>% 
   ungroup()%>% group_by(scenario)%>%
@@ -2381,13 +2382,13 @@ year_2030 <- proj_data %>% filter(year%in%c(2030))%>%
 
 
 #percapita share
-per_cap <- proj_data %>% filter(year==2030,scenario=="2019 Reference Case")%>%
+per_cap <- proj_data %>% filter(year==2030,scenario=="2021 Reference Case")%>%
   group_by(prov) %>% 
   summarize(pop=mean(pop))%>% ungroup()%>%
   mutate(per_cap_share=pop/sum(pop*(prov=="Canada"))*511) %>% select(prov,per_cap_share)
 
 
-sector_shares <- proj_data %>% filter(year==2017,scenario=="NIR 2019")%>%
+sector_shares <- proj_data %>% filter(year<=2020,scenario=="NIR 2022")%>%
   filter(prov=="Canada")%>%
   group_by(sector) %>% 
   mutate(sector_ghgs=sum(emissions))%>% ungroup()%>%
@@ -2399,16 +2400,9 @@ sector_shares <- proj_data %>% filter(year==2017,scenario=="NIR 2019")%>%
 
 
 
-#figure out last 5 years pro-rata by prov
-year_5 <- proj_data %>% filter(scenario=="NIR 2019",year%in%c(2014,2015,2016,2017,2018))%>% 
-  group_by(prov,scenario) %>% 
-  summarize(last_5_share=sum(emissions)/5)%>% select(prov,last_5_share)
-
-
-
 proj_data <- proj_data %>% group_by(prov,sector) %>% 
-  mutate(level_last_5=sum(emissions*(year%in%c(2014,2015,2016,2017,2018))*(scenario=="NIR 2019"))/5,
-        last_per_cap=sum(emissions*10^6/pop*(year==2020)*(scenario=="NIR 2019")),
+  mutate(level_last_5=sum(emissions*(year%in%c(2016,2017,2018,2019,2020))*(scenario=="NIR 2022"))/5,
+        last_per_cap=sum(emissions*10^6/pop*(year==2020)*(scenario=="NIR 2022")),
         )%>%ungroup()%>%
   left_join(year_5)%>%left_join(per_cap)
 
@@ -2421,10 +2415,10 @@ label_vals<-c(
 )
 
 
-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2019", "2019 Reference Case") & prov !="Canada"))+
+ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov !="Canada"))+
   geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   geom_line(aes(year,net_30_2005,linetype="A"),size=1.05)+
-  geom_line(aes(year,last_5_share,linetype="B"),size=1.05)+
+  #geom_line(aes(year,last_5_share,linetype="B"),size=1.05)+
   geom_line(aes(year,per_cap_share,linetype="C"),size=1.05)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks(),minor_breaks=waiver(),expand = c(0,0))+
