@@ -872,9 +872,10 @@ prov_proj<-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "202
 
 prov_proj+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Province",
+       #title="Canadian GHG Emissions by Province",
        subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
-       caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.")
+       #caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.",
+       NULL)
 ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7)
 
 
@@ -889,13 +890,28 @@ ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7)
 
 prov_proj+
   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Province",
+       #title="Canadian GHG Emissions by Province",
        subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
-       caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.")+
+       #caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.",
+       NULL)+
   geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
 ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7)
+
+
+prov_proj+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+       #title="Canadian GHG Emissions by Province",
+       subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
+       #caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.",
+       NULL)+
+  geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
+  #geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
+  #geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
+  NULL
+ggsave("images/inventory_proj_target.png",dpi = 300,width=14, height=7)
+
 
 prov_proj+
   scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
@@ -1439,14 +1455,15 @@ cdn_data <- cdn_data %>% mutate(scenario=as_factor(scenario),
 
 palette<-c(colors_tableau10()[1:4],"dodgerblue",colors_tableau10()[5:10])
 
-targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scenario!="2019 Reference Case",
+targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scenario!="2020 Reference Case",
+                                                                               scenario!="2019 Reference Case",
                                                                 scenario!="2018 Reference Case",
                                                                 scenario!="2017 Reference Case",
                                                                 scenario!="2016 Reference Case",
 ),aes(x=year))+
-  geom_line(aes(year,emissions,lty=scenario),color="black",size=2)+
-  geom_line(data=filter(cdn_data,grepl('National Inventory', scenario)),aes(year,emissions),color="black",size=2)+
-  scale_linetype_manual("",values=c("solid","11"))+
+  geom_line(aes(year,emissions,lty=scenario),color="black",size=1.45)+
+  geom_line(data=filter(cdn_data,grepl('National Inventory', scenario)),aes(year,emissions),color="black",size=1.45)+
+  scale_linetype_manual("",values=c("solid","21"))+
   geom_point(data=targets,aes(Year,target),size=5,colour=palette[9])+
   geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
   scale_color_manual("",values=palette[-1])+
@@ -1485,8 +1502,14 @@ targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(s
 targets_graph+ 
   labs(title="Canada's GHG Emissions, Projections and Future Targets",
        subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2022).")+
-annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)
+annotate("text",x=2031,y=660,label="2021 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)
 ggsave("images/emissions_and_targets_simple.png",dpi=300,width=13,height=6)
+
+
+targets_graph+ 
+  labs(subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2022).")+
+  annotate("text",x=2031,y=660,label="2021 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)
+ggsave("images/emissions_and_targets_ppt.png",dpi=300,width=14,height=7)
 
 
 targets_graph+annotate("text",x=2035.7,y=675,label="2020 Reference Cases",color="black",fontface="bold",hjust=0)+
