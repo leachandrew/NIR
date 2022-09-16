@@ -1080,7 +1080,7 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canad
        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("images/inventory_provs.png",dpi = 600,width=14, height=7)
+ggsave("images/inventory_provs.png",dpi = 300,width=14, height=7,bg="white")
 
 ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada"))+
   geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.5,alpha=.6)+
@@ -1243,7 +1243,7 @@ proj_data %>% left_join(pop_data %>%
   filter(scenario%in% c("NIR 2022") & prov !="Canada")%>%
   ggplot()+
   geom_area(aes(year,emissions/Prov_pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
-  geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
+  #geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
@@ -1274,7 +1274,7 @@ proj_data %>% left_join(pop_data %>%
        #caption=str_wrap("Source: Population via Statistics Canada, emissions via Environment and Climate Change Canada 2020 National Inventory (1990-2018). Graph by @andrew_leach.",width = 180)
        NULL
   )
-ggsave("images/inventory_per_capita.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_per_capita.png",dpi = 300,width=14, height=7,bg="white")
 
 
 proj_data %>% left_join(pop_data %>% 
