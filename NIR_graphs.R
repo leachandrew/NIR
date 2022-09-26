@@ -1465,7 +1465,7 @@ targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(s
 ),aes(x=year))+
   geom_line(aes(year,emissions,lty=scenario),color="black",size=1.45)+
   geom_line(data=filter(cdn_data,grepl('National Inventory', scenario)),aes(year,emissions),color="black",size=1.45)+
-  scale_linetype_manual("",values=c("solid","21"))+
+  scale_linetype_manual("",values=c("solid","31"))+
   geom_point(data=targets,aes(Year,target),size=5,colour=palette[9])+
   geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
   scale_color_manual("",values=palette[-1])+
@@ -1514,7 +1514,7 @@ targets_graph+
 ggsave("images/emissions_and_targets_ppt.png",bg="white",dpi=300,width=14,height=7)
 
 
-targets_graph+annotate("text",x=2035.7,y=675,label="2020 Reference Cases",color="black",fontface="bold",hjust=0)+
+targets_graph+annotate("text",x=2035.7,y=675,label="2021 Reference Cases",color="black",fontface="bold",hjust=0)+
   labs(title="Canada's GHG Emissions, Projections and Future Targets",
        subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2022).")+
       annotate("text",x=2032.18,y=675,label="2019 and ",color=palette[1],fontface="bold",hjust=0)+
@@ -1525,23 +1525,30 @@ targets_graph+annotate("text",x=2035.7,y=675,label="2020 Reference Cases",color=
                 ,label=scenario,color=scenario))
 ggsave("images/emissions_and_targets_proj.png",bg="white",dpi=300,width=13,height=6)
 
+os_proj<-proj_data_2022%>%filter(subsector_level_2=="Oil Sands",scenario=="2021 Reference Case",region=="Canada",year>=2020)%>%
+  group_by(year,subsector_level_2)%>%summarize(emissions=sum(emissions))
+
+oil_proj<-proj_data_2022%>%filter(sector=="Oil and Gas",scenario=="2021 Reference Case",region=="Canada",year>=2020)%>%
+  group_by(year,sector)%>%summarize(emissions=sum(emissions,na.rm = T))
 
 
-targets_graph+ annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
-  geom_line(data=NIR_natl%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=2)+
-  #geom_line(data=filter(proj_data,sector=="Oil and Gas",scenario=="NIR 2022",Prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="solid")+
+targets_graph+ annotate("text",x=2031,y=675,label="2021 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
+  geom_line(data=NIR_natl%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[7],size=1.5)+
+  geom_line(data=oil_proj,aes(year,emissions),color=palette[7],size=1.5,linetype="31")+
+  annotate("text",x=2010,y=230,label="Inventory (1990-2020) and projected (2021-2030) emissions from oil and gas",  color=palette[7],fontface="bold",hjust=0)+
+
+  geom_line(data=new_nir%>%filter(sector=="Oil Sands",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=1.5)+
+  geom_line(data=os_proj,aes(year,emissions),color=palette[4],size=1.5,linetype="31")+
+  annotate("text",x=2010,y=130,label="Inventory (1990-2020) and projected (2021-2030) emissions from oil sands",  color=palette[4],fontface="bold",hjust=0)  
   
-  geom_line(data=proj_data%>%filter(sector=="Oil and Gas",scenario=="2020 Reference Case",prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="11")+
-  
-  annotate("text",x=1992,y=300,label="Inventory (1990-2020) and projected (2021-2030) emissions from oil and gas",
-  color=palette[4],fontface="bold",hjust=0)
-ggsave("images/emissions_and_targets_oil.png",bg="white",dpi=300,width=13,height=6)
+ggsave("images/emissions_and_targets_oil.png",bg="white",dpi=600,width=13,height=6)
 
 targets_graph+ annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
   geom_line(data=new_nir%>%filter(sector=="Oil Sands",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=2)+
+  #geom_line(data=new_nir%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=2)+
   #geom_line(data=filter(proj_data,sector=="Oil and Gas",scenario=="NIR 2022",Prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="solid")+
   #geom_line(data=proj_data%>%filter(sector=="Oil and Gas",scenario=="2020 Reference Case",prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="11")+
-  geom_point(aes(2030,100),size=3,colour=palette[4])+ #rio target
+  #geom_point(aes(2030,100),size=3,colour=palette[4])+ #rio target
   annotate("text",x=2029,y=120,label="ECCC (2022) oil sands emissions (1990-2020) and 2030 projection",
            colour=palette[4],fontface="bold",hjust=1)
   ggsave("images/emissions_and_targets_oil_sands.png",bg="white",dpi=300,width=13,height=6)
