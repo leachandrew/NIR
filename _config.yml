@@ -9,6 +9,7 @@ plugins:
 
 remote_theme: daattali/beautiful-jekyll
 
+
 navbar-links:
   National Emissions and Target: "canada"
   Provinces: "provinces"
