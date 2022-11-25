@@ -96,8 +96,8 @@ get_new_nir<-function() {
 }
 
 #here, we want to use the new inventory data
-new_nir<-get_new_nir()
-save(new_nir,file = "data/nir_data.Rdata")
+#new_nir<-get_new_nir()
+#save(new_nir,file = "data/nir_data.Rdata")
 
 load(file = "data/nir_data.Rdata")
 
@@ -508,6 +508,7 @@ ggsave("images/natl_per_cap.png",height = 9,width = 16,bg="white",dpi=300)
 oil_sectors<-c("Conventional Heavy Oil Production","Conventional Light Oil Production","Frontier Oil Production",
                "Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
 
+oil_sands_sectors<-c("Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
 
 nir_oil<-ggplot(new_nir %>% filter(Prov=="Canada",sector%in%oil_sectors)%>%
                   mutate(sector=as_factor(sector),
@@ -714,7 +715,7 @@ ggsave("images/inventory_shares.png",width=16,height=9,bg="white",dpi=600)
 
 
 #2022 Projections Data
-proj_data_2022<-read.csv("data/ec_projections_2022.csv",skip = 0,na = "-") %>% 
+proj_data_2022<-read.csv("data/ec_projections_2022.csv",skip = 0,na = "-",fileEncoding = "Latin1", check.names = F) %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
   pivot_longer(-c(1:7),names_to = "year",values_to = "emissions")%>%
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
@@ -726,7 +727,7 @@ names(proj_data_2022)<-c("region","scenario","sector","subsector_level_1","subse
 file_loc<-"https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2020/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
 download.file(file_loc,destfile="data/ec_projections_2020.csv",mode = "wb")
 
-proj_data_2020<-read.csv("data/ec_projections_2020.csv",skip = 0,na = "-") %>% 
+proj_data_2020<-read.csv("data/ec_projections_2020.csv",skip = 0,na = "-",fileEncoding = "Latin1") %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
   pivot_longer(-c(1:7),names_to = "year",values_to = "emissions")%>%
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
@@ -737,7 +738,7 @@ names(proj_data_2020)<-c("region","scenario","sector","subsector_level_1","subse
 
 file_loc<-"http://data.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2018/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
 download.file(file_loc,destfile="data/ec_projections_2018.csv",mode = "wb")
-proj_data_2018<-read.csv("data/ec_projections_2018.csv",skip = 0,na = "-") %>% 
+proj_data_2018<-read.csv("data/ec_projections_2018.csv",skip = 0,na = "-",fileEncoding = "Latin1") %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
   pivot_longer(-c(1:7),names_to = "year",values_to = "emissions")%>%
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
@@ -885,6 +886,7 @@ proj_data<-proj_data %>% left_join(basis_2005)%>% left_join(last_5)%>% left_join
 
 proj_data<-proj_data %>% filter(!((scenario=="2021 Reference Case") & (year<=2020)))
 
+proj_data<-proj_data %>%mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
 
 testing<-filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov !="Canada")
 
@@ -921,7 +923,48 @@ prov_proj+
        subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
        #caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.",
        NULL)
-ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7,bg="white")
+
+
+qc_transp<-proj_data %>% filter(scenario=="NIR 2022")%>%
+  filter(sector=="Transportation" & prov=="QC")%>%
+  bind_rows(NIR_natl %>% filter(sector=="Oil and Gas" & Prov=="Canada")%>% rename(emissions=GHGs,year=Year))%>%
+  select(sector,emissions,year)%>%
+  group_by(sector)%>% mutate(ghg_index_15=emissions/sum(emissions*(year==2015))*100)%>%
+  filter(year>=2015)
+
+qc_transp%>% ggplot()+
+  geom_line(aes(year,ghg_index_15,group=sector,color=sector),linewidth=1.25)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="B")+
+  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+  #scale_linetype_manual("",values=c("11","22","33"),guide = "legend")+
+  expand_limits(y=c(80,120))+
+  blake_theme()+ theme(panel.spacing = unit(.75,"lines"))+
+  theme(
+    plot.margin = margin(t = .05, r = .1, b = .025, l = .1,unit= "cm"),
+    axis.ticks.x = element_line(size = rel(1),colour="#D8D8D8"),    # Change x axis ticks only
+    axis.ticks.length = unit(5, "pt"), # Change the length of tick marks
+    #legend.position = c(.95,.6),
+    legend.position = "none",
+    legend.key.width = unit(1.05,"cm"),
+    legend.spacing.y = unit(1.0, 'cm'),
+    legend.text = element_text(margin = margin(t = 10)),
+    axis.text.x = element_text(hjust = .5,vjust=.5,size=rel(.7)),
+    strip.text = element_text(size=rel(.7) ),
+    legend.spacing = unit(1.0, 'cm')
+  )+
+  labs(x=NULL,y=expression('Indexed Annual Emissions  '*'(MtCO'[2]*'e), 2015=100'),
+       #title="Canadian GHG Emissions by Province",
+       #subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
+       #caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.",
+       NULL)
+
+ggsave("images/qc_index.png",dpi = 300,width=14, height=7,bg="white")
+
 
 
 prov_proj+
@@ -930,7 +973,7 @@ prov_proj+
        title="Canadian GHG Emissions by Province",
        subtitle=paste("2022 National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
        caption="Source: Environment and Climate Change Canada. Graph by @andrew_leach.")
-ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7,bg="white")
 
 
 prov_proj+
@@ -942,7 +985,7 @@ prov_proj+
   geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
-ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7,bg="white")
 
 
 prov_proj+
@@ -955,7 +998,7 @@ prov_proj+
   #geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
   #geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
   NULL
-ggsave("images/inventory_proj_target.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_proj_target.png",dpi = 300,width=14, height=7,bg="white")
 
 
 prov_proj+
@@ -967,7 +1010,7 @@ prov_proj+
   geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
-ggsave("images/inventory_proj_targets_bw.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_proj_targets_bw.png",dpi = 300,width=14, height=7,bg="white")
 
 
 sector_proj<-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov !="Canada"))+
@@ -1005,7 +1048,7 @@ sector_proj+
        title="Canadian GHG Emissions by Sector",
        subtitle=paste("2021 National Inventory (1990-2020) levels and 2021 Reference Case projections (2021-2030)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada (2021). Reference Case projections include policies and measures that were in place as of September 2019. Graph by @andrew_leach.",width = 180))
-ggsave("images/sector_proj.png",dpi = 300,width=14, height=7)
+ggsave("images/sector_proj.png",dpi = 300,width=14, height=7,bg="white")
 
 sector_proj+
   scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
@@ -1049,7 +1092,7 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference
        title="Canadian Electricity Sector GHG Emissions",
        subtitle=paste("National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada. Graph by @andrew_leach.",width = 180))
-ggsave("images/power_proj.png",dpi = 300,width=14, height=7)
+ggsave("images/power_proj.png",dpi = 300,width=14, height=7,bg="white")
 
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada" & sector=="Oil and Gas"))+
@@ -1210,22 +1253,21 @@ ggsave("images/power_proj_prov.png",dpi = 300,width=14, height=7,bg="white")
 
 
 
-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada"))+
-  geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.5,alpha=.6)+
+inventory_provs<-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada"))+
+  geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
   scale_y_continuous(breaks=pretty_breaks(n=5))+
   
   scale_fill_viridis("",discrete=TRUE,option="B")+
-  
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.85,end=0.01)+
   scale_colour_manual("",values="black",guide = "legend")+
   geom_hline(aes(yintercept=0))+
   #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
   theme_tufte()+theme(
-    legend.position = c(.95, .7),
+    legend.position = "right",
     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
     legend.text = element_text(colour="black", size = 12),
     plot.caption = element_text(size = 10, face = "italic",hjust=0),
@@ -1238,9 +1280,70 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canad
     axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
     strip.text.x = element_text(size = 12, colour = "black", angle = 0),
     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'))
+inventory_provs
+ggsave("images/inventory_provs_plain.png",dpi = 300,width=14, height=7,bg="white")
+
+#inventory_provs+ theme(
+#  text = element_text(size = 20,family="Times New Roman MS"))
+#ggsave("images/inventory_provs_plain.png",dpi = 300,width=14, height=7,bg="white")
+#ggsave("images/inventory_provs_plain.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+
+
+inventory_provs+ 
+  scale_fill_grey("",start=0.85, end=0)+
+  theme(legend.position = c(.9,.8),
+  text = element_text(size = 20,family="Times New Roman MS"))
+ggsave("images/inventory_provs_plain.png",dpi = 300,width=14, height=7,bg="white")
+ggsave("images/inventory_provs_plain.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+
+
+
+
+nir_oil_elec_ab<-
+  ggplot(new_nir %>% filter(Prov=="AB",sector%in%oil_sands_sectors)%>%
+                     mutate(sector=as_factor(sector),
+                            sector=fct_relevel(sector,"Conventional Light Oil Production")))+
+  geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
+  geom_line(data=new_nir %>% filter(Prov=="AB",sector=="Electricity"),
+            aes(Year,GHGs,group=sector,color=sector),size=1.5,lty="21")+
+  #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
+  scale_fill_manual("",values=viridis(10,option="B",direction = 1)[c(10,6,4)])+
+  scale_color_manual("",values="black")+
+  #scale_fill_viridis("",discrete=TRUE,option="D")+
+  scale_x_continuous(breaks=pretty_breaks(n=15), expand = c(0,0))+
+  scale_y_continuous(breaks=pretty_breaks(n=5), expand = c(0,0))+
+  guides(fill=guide_legend(nrow =1,byrow=TRUE))+
+  theme_tufte()+theme(
+    legend.position = "bottom",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
   )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Province",
+  labs(x=NULL,y=expression('Annual GHG Emissions  '*'(Mt CO'[2]*'e)'))
+nir_oil_elec_ab
+ggsave("images/nir_oil_elec_ab.png",width=16,height=9,bg="white",dpi=300)
+
+nir_oil_elec_ab+ 
+  scale_fill_grey("",start=.75,end=.25)+
+  theme(
+  text = element_text(size = 20,family="Times New Roman MS"))
+ggsave("images/nir_oilsands_elec_ab_plain.png",dpi = 300,width=14, height=7,bg="white")
+ggsave("images/nir_oilsands_elec_ab_plain.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+
+
+
+inventory_provs+
+  labs(title="Canadian GHG Emissions by Province",
        subtitle=paste("2022 National Inventory (1990-2020)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
        NULL
@@ -1286,7 +1389,8 @@ ggsave("images/inventory_provs_2015.png",dpi = 600,width=14, height=7)
 
 
 
-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada"))+
+inventory_sector<-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada")%>%
+                           mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  ))))+
   geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
   facet_wrap( ~ sector,nrow = 1)+
@@ -1314,13 +1418,25 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canad
     strip.text.x = element_text(size = 12, colour = "black", angle = 0),
     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
   )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Sector",
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'))
+inventory_sector
+ggsave("images/inventory_sector_plain.png",dpi = 300,width=14, height=7,bg="white")
+
+inventory_sector+
+  scale_fill_grey("",start=0.85, end=0)+
+  theme(legend.position = c(.95,.6),
+        text = element_text(size = 20,family="Times New Roman MS"))
+ggsave("images/inventory_sector_plain.png",dpi = 300,width=14, height=7,bg="white")
+ggsave("images/inventory_sector_plain.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+
+
+inventory_sector+
+labs( title="Canadian GHG Emissions by Sector",
        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("images/inventory_sector.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_sector.png",dpi = 300,width=14, height=7,bg="white")
 
 
 ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada"))+
@@ -1406,6 +1522,7 @@ proj_data %>% left_join(pop_data %>%
                                 mutate(pop_2005=sum(Prov_pop*(Year=="2005")))%>%ungroup()%>%
                                 mutate(Code=as_factor(Code),Year=as.double(Year)) %>% rename(year=Year,prov=Code))%>%
   filter(scenario%in% c("NIR 2022") & prov !="Canada")%>%
+  mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))%>%
   ggplot()+
   geom_area(aes(year,emissions/Prov_pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   #geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
@@ -1447,6 +1564,7 @@ proj_data %>% left_join(pop_data %>%
                           mutate(pop_2005=sum(Prov_pop*(Year=="2005")))%>%ungroup()%>%
                           mutate(Code=as_factor(Code),Year=as.double(Year)) %>% rename(year=Year,prov=Code))%>%
   filter(scenario%in% c("NIR 2022") & prov !="Canada",year<2016)%>%
+  mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))%>%
   ggplot()+
   geom_area(aes(year,emissions/Prov_pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
   geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
@@ -1695,6 +1813,7 @@ os_proj<-proj_data_2022%>%filter(subsector_level_2=="Oil Sands",scenario=="2021 
 
 oil_proj<-proj_data_2022%>%filter(sector=="Oil and Gas",scenario=="2021 Reference Case",region=="Canada",year>=2020)%>%
   group_by(year,sector)%>%summarize(emissions=sum(emissions,na.rm = T))
+
 
 
 targets_graph+ annotate("text",x=2031,y=675,label="2021 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
