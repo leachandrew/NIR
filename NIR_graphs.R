@@ -1056,7 +1056,7 @@ sector_proj+
        title="Canadian GHG Emissions by Sector",
        subtitle=paste("2021 National Inventory (1990-2020) levels and 2021 Reference Case projections (2021-2030)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada (2021). Reference Case projections include policies and measures that were in place as of September 2019. Graph by @andrew_leach.",width = 180))
-ggsave("images/sector_proj_bw.png",dpi = 300,width=14, height=7)
+ggsave("images/sector_proj_bw.png",dpi = 300,width=14, height=7,bg="white")
 
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov !="Canada" & sector=="Electricity"))+
@@ -1093,6 +1093,43 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference
        subtitle=paste("National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
        caption=str_wrap("Source: Environment and Climate Change Canada. Graph by @andrew_leach.",width = 180))
 ggsave("images/power_proj.png",dpi = 300,width=14, height=7,bg="white")
+
+
+ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov =="AB" & sector=="Electricity"))+
+  geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.4)+
+  geom_area(data=filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2020 Reference Case") & prov =="AB" & year<=2018 & sector=="Electricity"),
+            aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
+  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 sector GHGs",width = 20)),linetype=1,size=1.05)+
+  #facet_wrap( ~ sector,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  scale_fill_manual("",values = blakes_blue,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+  scale_colour_manual("",values="black",guide = "legend")+
+  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_minimal()+theme(
+    legend.position = "none",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+       title="Alberta Electricity Sector GHG Emissions",
+       subtitle=paste("National Inventory (1990-2020) levels and 2021 Reference Case projections (2020-2030)",sep=""),
+       caption=str_wrap("Source: Environment and Climate Change Canada. Graph by @andrew_leach.",width = 180))
+ggsave("images/power_proj_AB.png",dpi = 300,width=14, height=7,bg="white")
+
 
 
 ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2022") & prov !="Canada" & sector=="Oil and Gas"))+
