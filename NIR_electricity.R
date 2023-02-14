@@ -338,7 +338,7 @@ prov_data<-get_data()
   
   ccir<-read_excel("bens_data.xlsx",sheet = "Sheet2") %>% as_tibble()%>%clean_names()
   
-  ccir<-ccir %>% mutate(plant=factor(generation,labels = paste(generation,"\nEmissions Rate=",ei,"t/MWh\n",sep="")[1:2]),
+  ccir<-ccir %>% mutate(plant=factor(generation,labels = paste(generation,"\nGHG Rate=",ei,"t/MWh\n",sep="")[1:2]),
                         oba_val=oba*price,
                         net_charge=ctax-oba_val,
                         net=ctax-oba_val
@@ -425,7 +425,7 @@ prov_data<-get_data()
       #geom_col(aes(prov,ghg,group=fuel,fill=fuel),position = "stack")+
       #geom_col(aes(plant,ctax),fill=NA,position = "stack",colour="black",size=.6)+
       geom_col(aes(plant,amt,group=charge,fill=charge),position = "stack",colour="black",size=.6)+
-      geom_text(aes(x=plant,y=oba*price/2,label=paste("$",format(oba*price,nsmall=2),"/MWh",sep="")),colour="black",size=rel(4),show.legend = FALSE)+
+      geom_text(aes(x=plant,y=oba*price/2,label=paste("$",format(oba*price,nsmall=2),"/MWh",sep="")),colour="black",size=rel(5),show.legend = FALSE)+
   
       geom_text(aes(x=plant,y=case_when(
         net_charge>2 ~ ctax-net_charge/2,
@@ -433,7 +433,7 @@ prov_data<-get_data()
         net_charge<0 ~ net_charge/2,
         TRUE ~ ctax-net_charge/2),
         
-        label=ifelse(net_charge!=0,paste("$",format(ctax-oba*price,nsmall=2),"/MWh",sep=""),NA)),colour="black",size=rel(4),show.legend = FALSE)+
+        label=ifelse(net_charge!=0,paste("$",format(ctax-oba*price,nsmall=2),"/MWh",sep=""),NA)),colour="black",size=rel(5),show.legend = FALSE)+
 
       scale_fill_manual("",values=c("grey90","grey60"),
                         breaks =c("Estimated value of output-based allocation of emissions credits ($/MWh)",
@@ -448,12 +448,12 @@ prov_data<-get_data()
         plot.title = element_text(size=16,face = "bold"),
         plot.subtitle = element_text(size = 10),
         #panel.grid.minor = element_blank(),
-        axis.text.y = element_text(size = 12, colour="black"),
+        axis.text.y = element_text(size = 16, colour="black"),
         axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
         axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
         #axis.text.x = element_blank(),
-        axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
-        axis.title.y = element_text(size = 14, colour="black"),
+        axis.text.x = element_text(size = 13, colour = "black", hjust=0.5,vjust=0.5),
+        axis.title.y = element_text(size = 13, colour="black"),
         axis.ticks = element_blank(),
         text = element_text(size = 20,family="Times New Roman MS")
       )+
@@ -467,7 +467,7 @@ prov_data<-get_data()
     
     
     
-    ggsave("images/tier_sger.png",width = 16,height=8,dpi=300,bg="white")
+    ggsave("images/tier_sger.png",width = 18,height=8,dpi=300,bg="white")
     #ggsave("images/ccir_sger.eps",width = 14,height=9,dpi=300,bg="white",device=cairo_ps)
     
          
@@ -477,7 +477,7 @@ ggppa_comp<-read_excel("bens_data.xlsx",sheet = "Sheet3") %>%
   as_tibble()%>%clean_names()
 
 ggppa_comp <-ggppa_comp%>%mutate(
-  generation=ifelse(generation!="Zero-emissions",paste(generation,"\nEmissions Rate=",ei,"t/MWh\n",sep=""),generation),
+  generation=ifelse(generation!="Zero-emissions",paste(generation,"\nGHG Rate=",ei,"t/MWh\n",sep=""),generation),
   plant=factor(generation),
   ctax=ei*price,
   oba_val=oba*price,
@@ -501,12 +501,12 @@ ggppa_comp <-ggppa_comp%>%mutate(
   
 ggplot(ggppa_comp)+
   geom_col(aes(plant,amt,group=charge,fill=charge),position = "stack",colour="black",size=.6)+
-  geom_text(aes(x=plant,y=ifelse(oba!=0,oba*price/2,-2),label=paste("$",format(oba*price,nsmall=2),"/MWh",sep="")),colour="black",size=rel(4),show.legend = FALSE)+
+  geom_text(aes(x=plant,y=ifelse(oba!=0,oba*price/2,-2),label=paste("$",format(oba*price,nsmall=2),"/MWh",sep="")),colour="black",size=rel(5),show.legend = FALSE)+
   
   #geom_text(aes(x=plant,y=ctax-net_charge/2,label=paste("$",format(ctax-oba*price,nsmall=2),"/MWh",sep="")),colour="black",size=rel(4),show.legend = FALSE)+
   
   
-  geom_text(aes(x=plant,y=ifelse(net_charge>0,ctax-net_charge/2,net_charge/2),label=ifelse(net_charge!=0,paste("$",format(ctax-oba*price,nsmall=2),"/MWh",sep=""),NA)),colour="black",size=rel(4),show.legend = FALSE)+
+  geom_text(aes(x=plant,y=ifelse(net_charge>0,ctax-net_charge/2,net_charge/2),label=ifelse(net_charge!=0,paste("$",format(ctax-oba*price,nsmall=2),"/MWh",sep=""),NA)),colour="black",size=rel(5),show.legend = FALSE)+
   
   scale_fill_manual("",values=c("grey90","grey60"),
                     breaks =c("Estimated value of output-based allocation of emissions credits ($/MWh)",
@@ -525,8 +525,8 @@ ggplot(ggppa_comp)+
     axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
     axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
     #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
-    axis.title.y = element_text(size = 14, colour="black"),
+    axis.text.x = element_text(size = 13, colour = "black", hjust=0.5,vjust=0.5),
+    axis.title.y = element_text(size = 13, colour="black"),
     axis.ticks = element_blank(),
     text = element_text(size = 20,family="Times New Roman MS")
   )+
@@ -537,7 +537,7 @@ ggplot(ggppa_comp)+
        NULL
   )
 
-ggsave("images/ccir_ggppa.png",width = 17,height=9,dpi=300,bg="white")
+ggsave("images/ccir_ggppa.png",width = 19,height=9,dpi=300,bg="white")
 
 
 
