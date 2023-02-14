@@ -944,7 +944,8 @@ prov_proj<-
   proj_graph()+
   NULL
   
-prov_proj+proj_labs
+prov_proj+proj_labs+
+scale_fill_viridis("",discrete=TRUE,option="cividis")
 ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7,bg="white")
 
 
@@ -994,6 +995,7 @@ sector_proj<-
   NULL
 
 sector_proj+proj_labs+
+  scale_fill_viridis("",discrete=TRUE,option="cividis")
 labs(title="Canadian GHG Emissions by Sector")
 ggsave("images/sector_proj.png",dpi = 300,width=14, height=7,bg="white")
 
