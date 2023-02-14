@@ -25,7 +25,7 @@ We can also look carefully at a couple of key sectors:
 
 Oil and gas
 
-<a href="images/oil_gas_proj" target="_blank">
+<a href="images/oil_proj" target="_blank">
   <img border="0" align="center"  src="images/oil_proj.png"/>
 </a>
 
