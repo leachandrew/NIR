@@ -5,7 +5,7 @@ Alberta's emissions place its economy on a collision course with Canada's emissi
 </a>
 
 
-And, oil and gas, so important to Alberta's economy:
+And, oil and gas, which is so important to Alberta's economy:
 
 <a href="images/nir_AB_oil_proj.png" target="_blank">
   <img border="0" align="center"  src="images/nir_AB_oil_gas.png"/>
