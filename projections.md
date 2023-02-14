@@ -8,14 +8,14 @@ At irregular intervals, [emissions projections](https://www.canada.ca/en/environ
 
 We can also combine the inventory data with projections to give a sense of where our emissions are expected to come from, here by sector and province:
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/inventory_proj.png" target="_blank">
   <img border="0" align="center"  src="images/inventory_proj.png"/>
 </a>
 
 
 and here are the same data, arrayed by sector with colors for each province or region:
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/sector_proj.png" target="_blank">
   <img border="0" align="center"  src="images/sector_proj.png"/>
 </a>
 
@@ -25,12 +25,12 @@ We can also look carefully at a couple of key sectors:
 
 Oil and gas
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/oil_gas_proj" target="_blank">
   <img border="0" align="center"  src="images/oil_gas_proj.png"/>
 </a>
 
 and power
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/power_proj.png" target="_blank">
   <img border="0" align="center"  src="images/power_proj.png"/>
 </a>
