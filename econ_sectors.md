@@ -4,7 +4,6 @@ Slicing Canada's emissions inventory by economic sector and province shows a sur
   <img border="0" align="center"  src="images/inventory_sector.png"/>
 </a>
 
-
 Adding projections from ECCC shows where we expect emissions trends to take us:
 
 <a href="images/sector_proj.png" target="_blank">
