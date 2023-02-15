@@ -1025,28 +1025,6 @@ pc_prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,proj
 ggsave("images/inventory_proj_pc.png",dpi = 300,width=14, height=7,bg="white")
 
 
-
- per_cap_proj<- ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada")%>%
-           filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)))+
-  geom_area(aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
-  geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020),
-            aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.8)+
-  facet_wrap( ~ prov,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
-  scale_linetype_manual("",values=c("11","22","33"),guide = "legend")+
-  proj_graph()+
-  
-  proj_labs+
-  labs(y=expression('Annual Emissions  '*'(tCO'[2]*'e per capita)'),
-       title="Canadian GHG Emissions Per Capita by Province",
-       NULL)+
-  NULL
- 
-per_cap_proj+
-   scale_fill_viridis("",discrete=TRUE,option="cividis")
-ggsave("images/proj_per_capita.png",dpi = 300,width=14, height=7,bg="white")
-
 #combined inventory and projections
 
 sector_plot<-  ggplot()+

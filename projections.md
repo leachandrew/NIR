@@ -12,6 +12,12 @@ We can also combine the inventory data with projections to give a sense of where
   <img border="0" align="center"  src="images/inventory_proj.png"/>
 </a>
 
+and the striking envisioned decline in Alberta and Saskatchewan emissions per capita as Canada pushes to meet its 2030 target:
+<a href="images/inventory_proj_pc.png" target="_blank">
+  <img border="0" align="center"  src="images/inventory_proj_pc.png"/>
+</a>
+
+
 
 and here are the same data, arrayed by sector with colors for each province or region:
 
