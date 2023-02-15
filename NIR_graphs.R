@@ -780,6 +780,7 @@ proj_data<-proj_data %>% filter(!sector%in%c("International Emissions","n/a","WC
                          "NU"="Nunavut",
                          "NB"="New Brunswick",
                          "YT"="Yukon Territory",
+                         "YT"="Yukon",
                          "PE"="Prince Edward Island",
                          "NU"="Nunavut"
          ),
@@ -818,6 +819,8 @@ terr_ag_fix<-as_tibble(x=seq(1990,2020,1))%>% rename(year=value) %>% left_join(p
 
 proj_data<-proj_data %>% filter(!((prov=="TERR")&(sector=="Agriculture") &(scenario=="NIR 2022"))) %>% bind_rows(terr_ag_fix)
 
+
+terr<-proj_data %>% filter(prov=="TERR", scenario %in% c(inventory,project_case),sector=="Transportation")
 
 #figure out allocation rules from LLM Thesis.
 #load population projections
@@ -1046,7 +1049,7 @@ ggsave("images/inventory_sector.png",dpi = 220,width=14, height=7,bg="white")
 sector_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
             filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
           aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.4)
-ggsave("images/proj_sector.png",plot=sector_plot,dpi = 220,width=14, height=7,bg="white")
+ggsave("images/proj_sector.png",dpi = 220,width=14, height=7,bg="white")
 
 
 
