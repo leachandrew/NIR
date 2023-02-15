@@ -896,7 +896,9 @@ proj_data<-proj_data %>% filter(!((scenario=="2021 Reference Case") & (year<=202
 
 proj_data<-proj_data %>% left_join(pop_merge)
 
-proj_data<-proj_data %>%mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
+
+proj_data<-proj_data %>%filter(prov!="TERR")%>%
+  mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
 
 
 inventory<-"NIR 2022"
