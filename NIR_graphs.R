@@ -852,10 +852,12 @@ pop_proj<-read_csv("pop_proj.csv",col_types = cols(.default = "c")) %>%
                            #,"OTHER ATL" = c("NL", "NB","PE")
          ))%>%
   select(year=Year,prov,pop)%>% group_by(year,prov)%>%
-  summarize(pop=sum(pop)*1000)%>%filter(year<=2030,year>2020)
+  summarize(pop=sum(pop)*1000)%>%filter(year<=2035,year>2020)
 
 pop_merge<-pop_data%>%select(year=Year,prov=Code,pop=Prov_pop) %>%
   bind_rows(pop_proj)%>%mutate(year=as.numeric(year))
+
+
 
 alloc<-proj_data%>% left_join(pop_merge)%>%
   filter(scenario %in% c("NIR 2022","2021 Reference Case"))%>%
@@ -895,9 +897,10 @@ proj_data<-proj_data %>% left_join(basis_2005)%>% left_join(last_5)%>% left_join
 
 proj_data<-proj_data %>% filter(!((scenario=="2021 Reference Case") & (year<=2020)))
 
+proj_data<-proj_data %>% left_join(pop_merge)
+
 proj_data<-proj_data %>%mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
 
-testing<-filter(proj_data,emissions>0 & scenario%in% c("NIR 2022", "2021 Reference Case") & prov !="Canada")
 
 inventory<-"NIR 2022"
 project_case<-"2022 Additional Measures Scenario"
@@ -922,6 +925,7 @@ proj_graph<-function(){
   
 }
 
+inv_subtitle<-paste("2022 National Inventory (1990-2020) Emissions",sep="")
 proj_subtitle<-paste("2022 National Inventory (1990-2020) levels and 2022 Additional Measures Scenario projections (2020-2035, lighter fill)",sep="")
 proj_caption<-"Source: Environment and Climate Change Canada. Graph by @andrew_leach."
 proj_labs<- labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
@@ -971,14 +975,65 @@ geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 tar
 geom_line(aes(year,last_5,lty=str_wrap("Pro-rata share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
 ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7,bg="white")
 
-
-
 prov_proj+proj_labs+
-scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
-geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
-geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
-geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
+  scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
+  geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
+  geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
+  geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
 ggsave("images/inventory_proj_targets_bw.png",dpi = 300,width=14, height=7,bg="white")
+
+
+# per capita
+
+ per_cap_proj<- ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada")%>%
+           filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)))+
+  geom_area(aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+  geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020),
+            aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.8)+
+  facet_wrap( ~ prov,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_linetype_manual("",values=c("11","22","33"),guide = "legend")+
+  proj_graph()+
+  
+  proj_labs+
+  labs(y=expression('Annual Emissions  '*'(tCO'[2]*'e per capita)'),
+       title="Canadian GHG Emissions Per Capita by Province",
+       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+       #caption=str_wrap("Source: Population via Statistics Canada, emissions via Environment and Climate Change Canada 2020 National Inventory (1990-2018). Graph by @andrew_leach.",width = 180)
+       NULL
+  )+
+  NULL
+ 
+per_cap_proj+
+   scale_fill_viridis("",discrete=TRUE,option="cividis")
+ggsave("images/proj_per_capita.png",dpi = 300,width=14, height=7,bg="white")
+
+#combined inventory and projections
+
+sector_plot<-  ggplot()+
+  geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020),
+            aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
+  facet_wrap( ~ sector,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  scale_fill_viridis("",discrete=TRUE,option="cividis")+
+  #scale_fill_manual("",values=colors_ua10())+
+  scale_colour_manual("",values="black",guide = "legend")+
+  proj_graph()+
+  NULL
+
+sector_plot+
+labs(title="Canadian GHG Emissions by Sector",
+     subtitle=inv_subtitle)
+ggsave("images/inventory_sector.png",dpi = 220,width=14, height=7,bg="white")
+
+sector_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+            filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+          aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.4)
+ggsave("images/proj_sector.png",plot=sector_plot,dpi = 220,width=14, height=7,bg="white")
+
+
+
 
 
 sector_proj<-
@@ -1519,47 +1574,6 @@ ggsave("images/inventory_electricity.png",dpi = 300,width=14, height=7)
 
 
 #per capita
-
-proj_data %>% left_join(pop_data %>% 
-                                group_by(Code)%>%
-                                mutate(pop_2005=sum(Prov_pop*(Year=="2005")))%>%ungroup()%>%
-                                mutate(Code=as_factor(Code),Year=as.double(Year)) %>% rename(year=Year,prov=Code))%>%
-  filter(scenario%in% c("NIR 2022") & prov !="Canada")%>%
-  mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))%>%
-  ggplot()+
-  geom_area(aes(year,emissions/Prov_pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005/pop_2005*10^6,colour=str_wrap("30% below 2005 provincial GHGs per capita",width = 20)),linetype=1,size=1.05)+
-  facet_wrap( ~ prov,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_tufte()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    #panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(tCO'[2]*'e per capita)'),
-       #title="Canadian GHG Emissions Per Capita by Province",
-       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
-       #caption=str_wrap("Source: Population via Statistics Canada, emissions via Environment and Climate Change Canada 2020 National Inventory (1990-2018). Graph by @andrew_leach.",width = 180)
-       NULL
-  )
-ggsave("images/inventory_per_capita.png",dpi = 300,width=14, height=7,bg="white")
 
 
 proj_data %>% left_join(pop_data %>% 
