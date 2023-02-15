@@ -931,7 +931,7 @@ proj_labs<- labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
 
 
 
-prov_plot<-  ggplot()+
+prov_plot<-  ggplot(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada"))+
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020),
             aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.8)+
   facet_wrap( ~ prov,nrow = 1)+
@@ -969,32 +969,31 @@ prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project
   ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7,bg="white")
 
 
-
-
-  prov_proj+proj_labs+
+  prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+                        filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+                      aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
   geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
   geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
 ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7,bg="white")
 
 
-prov_proj+proj_labs+
-geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
-  NULL
+prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+                      filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+                    aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+  geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
+  scale_linetype_manual("",values=c("solid","31"))+
+    NULL
 ggsave("images/inventory_proj_target.png",dpi = 300,width=14, height=7,bg="white")
 
-prov_proj+proj_labs+
+prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+                      filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+                    aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
 geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
-geom_line(aes(year,last_5,lty=str_wrap("Pro-rata share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
+geom_line(aes(year,last_5,lty=str_wrap("Pro-rata share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)+
+scale_linetype_manual("",values=c("solid","31"))+
+  NULL
 ggsave("images/inventory_proj_targets.png",dpi = 300,width=14, height=7,bg="white")
-
-prov_proj+proj_labs+
-  scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
-  geom_line(aes(year,basis_2005,lty=str_wrap("Pro-rated share of 2030 target based on 2005 GHGs",width = 20)),color="black",size=1.05)+
-  geom_line(aes(year,per_cap_2030,lty=str_wrap("Equal per capita share of 2030 target",width = 20)),color="black",size=1.05)+
-  geom_line(aes(year,last_5,lty=str_wrap("Pro-rated share of 2030 target based on 2016-20 GHGs",width = 20)),color="black",size=1.05)
-ggsave("images/inventory_proj_targets_bw.png",dpi = 300,width=14, height=7,bg="white")
-
 
 # per capita
 

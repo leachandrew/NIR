@@ -14,8 +14,8 @@ Canada has a long road ahead, especially with the new Glasgow target to reduce e
 
 Canada's emissions inventory by province shows where emissions have increased and why different provinces may feel more of a threat from climate change policies.
 
-<a href="images/inventory_provs.png" target="_blank">
-  <img border="0" align="center"  src="images/inventory_provs.png"/>
+<a href="images/inventory_prov.png" target="_blank">
+  <img border="0" align="center"  src="images/inventory_prov.png"/>
 </a>
 
 
@@ -24,12 +24,5 @@ Slicing Canada's emissions inventory by economic sector and province shows a sur
 
 <a href="images/inventory_sector.png" target="_blank">
   <img border="0" align="center"  src="images/inventory_sector.png"/>
-</a>
-
-Canada's emissions inventory by IPCC sector and province reveals some other information about point vs non-point sources and, in this case, the small role of things like aviation.
-
-
-<a href="images/inventory_ipcc_sector.png" target="_blank">
-  <img border="0" align="center"  src="images/inventory_ipcc_sector.png"/>
 </a>
 
