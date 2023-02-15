@@ -720,9 +720,6 @@ proj_data_2023<-read.csv("data/ec_projections_2023.csv",skip = 0,na = "-",fileEn
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
 names(proj_data_2023)<-c("region","scenario","sector","subsector_level_1","subsector_level_2","subsector_level_3","unit","year","emissions")
 
-
-
-
 #2022 Projections Data
 proj_data_2022<-read.csv("data/ec_projections_2022.csv",skip = 0,na = "-",fileEncoding = "Latin1", check.names = F) %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
@@ -730,11 +727,9 @@ proj_data_2022<-read.csv("data/ec_projections_2022.csv",skip = 0,na = "-",fileEn
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
 names(proj_data_2022)<-c("region","scenario","sector","subsector_level_1","subsector_level_2","subsector_level_3","unit","year","emissions")
 
-
-
 #2020 projections data
-file_loc<-"https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2020/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
-download.file(file_loc,destfile="data/ec_projections_2020.csv",mode = "wb")
+#file_loc<-"https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2020/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
+#download.file(file_loc,destfile="data/ec_projections_2020.csv",mode = "wb")
 
 proj_data_2020<-read.csv("data/ec_projections_2020.csv",skip = 0,na = "-",fileEncoding = "Latin1") %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
@@ -745,8 +740,8 @@ names(proj_data_2020)<-c("region","scenario","sector","subsector_level_1","subse
 
 #load 2018 detailed projections data
 
-file_loc<-"http://data.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2018/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
-download.file(file_loc,destfile="data/ec_projections_2018.csv",mode = "wb")
+#file_loc<-"http://data.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2018/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
+#download.file(file_loc,destfile="data/ec_projections_2018.csv",mode = "wb")
 proj_data_2018<-read.csv("data/ec_projections_2018.csv",skip = 0,na = "-",fileEncoding = "Latin1") %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
   pivot_longer(-c(1:7),names_to = "year",values_to = "emissions")%>%
@@ -756,9 +751,8 @@ names(proj_data_2018)<-c("region","scenario","sector","subsector_level_1","subse
 
 
 #load 2019 detailed projections data
-file_loc<-"http://data.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2019/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
-download.file(file_loc,destfile="data/ec_projections_2019.csv",mode = "wb")
-
+#file_loc<-"http://data.ec.gc.ca/data/substances/monitor/canada-s-greenhouse-gas-emissions-projections/Previous-Projections-Precedentes/2019/GHG-GES/detailed_GHG_emissions_GES_detaillees.csv"
+#download.file(file_loc,destfile="data/ec_projections_2019.csv",mode = "wb")
 
 proj_data_2019<-
   read_csv("data/ec_projections_2019.csv",skip = 0,na = "-",col_types = cols(.default = "c")) %>%
@@ -905,6 +899,7 @@ proj_data<-proj_data %>%mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"
 inventory<-"NIR 2022"
 project_case<-"2022 Additional Measures Scenario"
 nir_year<-2020
+viridis_scheme<-"cividis"
 
 proj_graph<-function(){
   theme_minimal()+theme(
@@ -935,27 +930,45 @@ proj_labs<- labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
                   NULL)
 
 
-prov_proj<-
-  ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada")%>%
-           filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)))+
-  geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+
+prov_plot<-  ggplot()+
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020),
             aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.8)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
-  scale_linetype_manual("",values=c("11","22","33"),guide = "legend")+
-  proj_graph()+
+  scale_fill_viridis("",discrete=TRUE,option=viridis_scheme)+
+  #scale_fill_manual("",values=colors_ua10())+
+  scale_colour_manual("",values="black",guide = "legend")+
+  proj_graph()+proj_labs+
   NULL
-  
-prov_proj+proj_labs+
-scale_fill_viridis("",discrete=TRUE,option="cividis")
+
+prov_plot+
+  labs(title="Canadian GHG Emissions by Sector",
+       subtitle=inv_subtitle)
+ggsave("images/inventory_prov.png",dpi = 220,width=14, height=7,bg="white")
+
+
+prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+                        filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+                      aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)
 ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7,bg="white")
 
 
-prov_proj+proj_labs+
-scale_fill_grey("",guide = "legend",start = 0.85,end=0)+
-ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7,bg="white")
+prov_plot+
+  geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+             filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+           aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+scale_fill_grey("",guide = "legend",start = 0.85,end=0)
+ggsave("images/inventory_prov_bw.png",dpi = 300,width=14, height=7,bg="white")
+
+
+prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
+                      filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
+                    aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+  scale_fill_grey("",guide = "legend",start = 0.85,end=0)
+  ggsave("images/inventory_proj_bw.png",dpi = 300,width=14, height=7,bg="white")
+
+
 
 
   prov_proj+proj_labs+
