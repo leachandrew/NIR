@@ -26,3 +26,8 @@ Slicing Canada's emissions inventory by economic sector and province shows a sur
   <img border="0" align="center"  src="images/inventory_sector.png"/>
 </a>
 
+Canada's emissions inventory by province shown on a per-capita basis is particularly striking.
+
+<a href="images/inventory_prov_pc.png" target="_blank">
+  <img border="0" align="center"  src="images/inventory_prov_pc.png"/>
+</a>
