@@ -134,13 +134,6 @@ small_theme<-function(){
 
 
 
-#Set EIA API Key
-
-KEY <- "91b4dca0b858df64a2279d82f71af240"
-
-
-
-
 weekly_graphs<-function(caption_align=1){
   theme_minimal()+theme(
     plot.margin = margin(.25, .75, .25, .75, "cm"),
