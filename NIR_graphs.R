@@ -720,6 +720,7 @@ proj_data_2023<-read.csv("data/ec_projections_2023.csv",skip = 0,na = "-",fileEn
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
 names(proj_data_2023)<-c("region","scenario","sector","subsector_level_1","subsector_level_2","subsector_level_3","unit","year","emissions")
 
+
 #2022 Projections Data
 proj_data_2022<-read.csv("data/ec_projections_2022.csv",skip = 0,na = "-",fileEncoding = "Latin1", check.names = F) %>% 
   clean_names()%>%select(-c(2,4,6,8,10,12,14,28)) %>%
@@ -762,9 +763,15 @@ proj_data_2019<-
   mutate(year=gsub("x","",year),emissions=gsub("-","0",emissions),year=as.numeric(year),emissions=as.numeric(emissions))
 names(proj_data_2019)<-c("region","scenario","sector","subsector_level_1","subsector_level_2","subsector_level_3","unit","year","emissions")
 
+inventory<-"NIR 2022"
+project_case<-"2022 Additional Measures Scenario"
+nir_year<-2020
+viridis_scheme<-"cividis"
 
-proj_data<-proj_data_2019 %>% bind_rows(proj_data_2023,proj_data_2022,proj_data_2020,proj_data_2018)%>%
-  filter(scenario!="NIR 2018",scenario!="NIR 2019",scenario!="NIR 2021",sector!="Total")
+
+
+proj_data<-proj_data_2023 %>% bind_rows(proj_data_2022,proj_data_2020,proj_data_2019,proj_data_2018)%>%#bind_rows(proj_data_2022,proj_data_2020,proj_data_2019,proj_data_2018)%>%
+  filter(scenario!="NIR 2018",scenario!="NIR 2019",scenario!="NIR 2020",scenario!="NIR 2021",sector!="Total")
 
 proj_data<-proj_data %>% filter(!sector%in%c("International Emissions","n/a","WCI Credits"))%>%
   mutate(prov=as.factor(region),
@@ -795,7 +802,7 @@ proj_data<-proj_data %>% filter(!sector%in%c("International Emissions","n/a","WC
 #strip out nir from this csv, build new NIR
 
 proj_data<-proj_data%>% 
-  filter(scenario!="NIR 2018",scenario!="NIR 2019",scenario!="NIR 2020",scenario!="NIR 2021",scenario!="NIR 2022")%>%
+  filter(!grepl("NIR",scenario))%>%
   bind_rows(test=NIR_data %>%
     filter(sector %in% main_sectors)%>%
     mutate(sector=fct_other(sector,
@@ -849,7 +856,7 @@ pop_proj<-read_csv("pop_proj.csv",col_types = cols(.default = "c")) %>%
                            #,"OTHER ATL" = c("NL", "NB","PE")
          ))%>%
   select(year=Year,prov,pop)%>% group_by(year,prov)%>%
-  summarize(pop=sum(pop)*1000)%>%filter(year<=2035,year>2020)
+  summarize(pop=sum(pop)*1000)%>%filter(year<=2035,year>2022)
 
 pop_merge<-pop_data%>%select(year=Year,prov=Code,pop=Prov_pop) %>%
   bind_rows(pop_proj)%>%mutate(year=as.numeric(year))
@@ -887,24 +894,19 @@ basis_2005 <- proj_data %>% group_by(prov) %>%
 #proj_data<-proj_data%>% filter(sector!="Total")
 
 
-#for the plot data, we want NIR pre-2019 and projections post-2019
-proj_data$prov<-factor(proj_data$prov,levels = (c("Canada","BC","AB","SK","MB","ON","QC","NB", "NS", "PE", "NL","ATL","OTHER ATL","TERR")))
+#for the plot data, we want NIR pre-2020 and projections post-2020
+#proj_data$prov<-factor(proj_data$prov,levels = (c("Canada","BC","AB","SK","MB","ON","QC","NB", "NS", "PE", "NL","ATL","OTHER ATL","TERR")))
 
 proj_data<-proj_data %>% left_join(basis_2005)%>% left_join(last_5)%>% left_join(per_cap_2030)
 
-proj_data<-proj_data %>% filter(!((scenario=="2021 Reference Case") & (year<=2020)))
+#proj_data<-proj_data %>% filter(!((scenario=="2021 Reference Case") & (year<=2020)))
 
 proj_data<-proj_data %>% left_join(pop_merge)
 
 
-proj_data<-proj_data %>%filter(prov!="TERR")%>%
+proj_data<-proj_data %>%#filter(prov!="TERR")%>%
   mutate(prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
 
-
-inventory<-"NIR 2022"
-project_case<-"2022 Additional Measures Scenario"
-nir_year<-2020
-viridis_scheme<-"cividis"
 
 proj_graph<-function(){
   theme_minimal()+theme(
@@ -1464,7 +1466,7 @@ ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2022") & pr
        #caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("images/inventory_provs_2015.png",dpi = 600,width=14, height=7)
+ggsave("images/inventory_provs_2015.png",dpi = 600,width=14, height=7, bg="white")
 
 
 
@@ -1552,7 +1554,7 @@ ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2022") & pr
        #caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
        NULL
   )
-ggsave("images/inventory_sector_2015.png",dpi = 300,width=14, height=7)
+ggsave("images/inventory_sector_2015.png",dpi = 300,width=14, height=7,bg="white")
 
 
 
@@ -1778,15 +1780,14 @@ cdn_data <- cdn_data %>% mutate(scenario=as_factor(scenario),
 
 palette<-c(colors_tableau10()[1:4],"dodgerblue",colors_tableau10()[5:10])
 
-targets_graph<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scenario!="2020 Reference Case",
-                                                                               scenario!="2019 Reference Case",
-                                                                scenario!="2018 Reference Case",
-                                                                scenario!="2017 Reference Case",
-                                                                scenario!="2016 Reference Case",
-),aes(x=year))+
-  geom_line(aes(year,emissions,lty=scenario),color="black",size=1.45)+
-  geom_line(data=filter(cdn_data,grepl('National Inventory', scenario)),aes(year,emissions),color="black",size=1.45)+
-  scale_linetype_manual("",values=c("solid","31"))+
+
+
+targets_graph<-
+  ggplot(cdn_data%>%filter(!grepl('Additional', scenario))%>%filter(!grepl("NIR",scenario)),aes(x=year))+
+  
+  geom_line(aes(year,emissions,color=scenario),lty="11",size=1.45)+
+  geom_line(data=filter(cdn_data,grepl('NIR', scenario)),aes(year,emissions),color="black",size=1.45)+
+  #scale_linetype_manual("",values=c("solid","31"))+
   geom_point(data=targets,aes(Year,target),size=5,colour=palette[9])+
   geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
   scale_color_manual("",values=palette[-1])+
@@ -1883,7 +1884,7 @@ plot_2016<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scena
                                                                  scenario!="2017 Reference Case",
                                                                  scenario!="2020 Reference Case"),aes(x=year))+
   geom_line(data=filter(cdn_data,grepl('2016', scenario)),aes(year,emissions,lty=scenario),color="orange",size=2)+
-  geom_line(data=filter(cdn_data,grepl('National Inventory', scenario),year<2016),aes(year,emissions,lty=scenario),color="black",size=2)+
+  geom_line(data=filter(cdn_data,grepl('NIR', scenario),year<2016),aes(year,emissions,lty=scenario),color="black",size=2)+
   scale_linetype_manual("",values=c("11","solid","11"))+
   geom_point(data=targets%>%filter(Year<2050),aes(Year,target),size=5,colour=palette[9])+
   geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
@@ -1919,17 +1920,39 @@ plot_2016<-ggplot(filter(cdn_data,!grepl('Additional', scenario))%>%filter(scena
        subtitle="Source: Environment and Climate Change Canada Emissions Inventory (2021) and Projections (2016).")+
    annotate("text",x=2031,y=815,label="2016 ECCC Reference Case Projection (2016-2030)",color="orange",fontface="bold",hjust=0)
 plot_2016
-ggsave("images/emissions_and_targets_2016.png",bg="white",dpi=300,width=13,height=6)
+ggsave("images/emissions_and_targets_2016.png",bg="white",dpi=300,width=15,height=7)
 
 
-targets_graph
+targets_graph+
+  #annotate("text",x=2031,y=815,label="2016 ECCC Reference Case Projection (2016-2030)",color="orange",fontface="bold",hjust=0)+
+  #geom_line(data=filter(cdn_data,grepl('2016 Reference', scenario)),aes(year,emissions),lty="11",color="orange",size=2)+
+  geom_line(data=filter(cdn_data,grepl('2022 Additional Measures Scenario', scenario)),aes(year,emissions),lty="21",color="darkgreen",size=2)+
+  #geom_line(data=filter(cdn_data,grepl('2020 Reference', scenario)),aes(year,emissions),lty="11",color="black",size=2)+
+  annotate("text",x=2036,y=631,label="2022 ECCC Reference Case (2020-2035)",color="black",fontface="bold",hjust=0)+
+  annotate("text",x=2036,y=480,label="2022 ECCC Additional Measures Case (2020-2035)",color="darkgreen",fontface="bold",hjust=0)
+ggsave("images/emissions_and_targets_2022.png",bg="white",dpi=300,width=15,height=7)
 
 targets_graph+
   annotate("text",x=2031,y=815,label="2016 ECCC Reference Case Projection (2016-2030)",color="orange",fontface="bold",hjust=0)+
   geom_line(data=filter(cdn_data,grepl('2016 Reference', scenario)),aes(year,emissions),lty="11",color="orange",size=2)+
+  geom_line(data=filter(cdn_data,grepl('2022 Additional Measures Scenario', scenario)),aes(year,emissions),lty="21",color="darkgreen",size=2)+
   #geom_line(data=filter(cdn_data,grepl('2020 Reference', scenario)),aes(year,emissions),lty="11",color="black",size=2)+
-  annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2020-2030)",color="black",fontface="bold",hjust=0)
-ggsave("images/emissions_and_targets_2016-2020.png",bg="white",dpi=300,width=13,height=6)
+  annotate("text",x=2036,y=631,label="2022 ECCC Reference Case (2020-2035)",color="black",fontface="bold",hjust=0)+
+  annotate("text",x=2036,y=480,label="2022 ECCC Additional Measures Case (2020-2035)",color="darkgreen",fontface="bold",hjust=0)
+ggsave("images/emissions_and_targets_2016-2022.png",bg="white",dpi=300,width=15,height=7)
+
+
+targets_graph+
+  annotate("text",x=2031,y=815,label="2016 ECCC Reference Case Projection (2016-2030)",color="orange",fontface="bold",hjust=0)+
+  geom_line(data=filter(cdn_data,grepl('2019 Reference Case', scenario)),aes(year,emissions),lty="11",color="dodgerblue",size=2)+
+  annotate("text",x=2031,y=673,label="2019 ECCC Reference Case Projection (2019-2030)",color="dodgerblue",fontface="bold",hjust=0)+
+  geom_line(data=filter(cdn_data,grepl('2016 Reference', scenario)),aes(year,emissions),lty="11",color="orange",size=2)+
+  geom_line(data=filter(cdn_data,grepl('2022 Additional Measures Scenario', scenario)),aes(year,emissions),lty="21",color="darkgreen",size=2)+
+  #geom_line(data=filter(cdn_data,grepl('2020 Reference', scenario)),aes(year,emissions),lty="11",color="black",size=2)+
+  annotate("text",x=2036,y=631,label="2022 ECCC Reference Case (2020-2035)",color="black",fontface="bold",hjust=0)+
+  annotate("text",x=2036,y=480,label="2022 ECCC Additional Measures Case (2020-2035)",color="darkgreen",fontface="bold",hjust=0)
+ggsave("images/emissions_and_targets_2016-2019-2022.png",bg="white",dpi=300,width=15,height=7)
+
 
 
 oil_bbl<-read_excel("Crude_Oil_Production.xlsx",range = "A8:AU16",col_names = TRUE) %>%rename("product"=1)%>%
