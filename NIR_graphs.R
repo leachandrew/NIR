@@ -1,3 +1,4 @@
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #basic libraries
 
 library(ggthemes)
@@ -446,7 +447,7 @@ NIR_natl<-NIR_natl %>% mutate(
 ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),color="black",size=0.5)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="cividis",direction = -1)+
+  scale_fill_viridis("",discrete=TRUE,option="turbo",direction = -1)+
   scale_colour_manual("",values="black",guide = "legend")+
   scale_x_continuous(breaks=pretty_breaks(n=16), expand = c(0,0))+
   guides(fill=guide_legend(nrow =2,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
@@ -768,6 +769,7 @@ names(proj_data_2019)<-c("region","scenario","sector","subsector_level_1","subse
 
 inventory<-"NIR 2023"
 project_case<-"2022 Additional Measures Scenario"
+ref_case<-"2022 Reference Case"
 nir_year<-2021
 viridis_scheme<-"cividis"
 
@@ -953,14 +955,15 @@ prov_plot<-  ggplot(data = proj_data %>% filter(scenario%in% c(inventory,project
   NULL
 
 prov_plot+
-  labs(title="Canadian GHG Emissions by Sector",
+  labs(title="Canadian GHG Emissions by Province",
        subtitle=inv_subtitle)
 ggsave("images/inventory_prov.png",dpi = 220,width=14, height=7,bg="white")
 
 
 prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" )%>%
                         filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
-                      aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)
+                      aes(year,emissions,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
+  labs(title="Canadian GHG Emissions and Projections by Province")
 ggsave("images/inventory_proj.png",dpi = 300,width=14, height=7,bg="white")
 
 
@@ -1102,7 +1105,9 @@ ggplot()+
   geom_area(aes(year,emissions,fill=prov),color="black",position = "stack",linewidth=0.1,alpha=0.4)+
   scale_x_continuous(breaks=pretty_breaks(n=15))+
   #scale_fill_viridis("",discrete=TRUE,option="mako")+
-  scale_fill_viridis("",discrete=TRUE,option="cividis")+
+  #scale_fill_viridis("",discrete=TRUE,option="turbo")+
+  scale_fill_brewer("",palette = "Dark2")+
+  
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
   proj_labs+
@@ -1110,6 +1115,28 @@ ggplot()+
   labs(title=paste("Canadian GHG Emissions from ",sector_sent,sep=""))
 ggsave(file_sent,dpi = 300,width=14, height=7,bg="white")
 }
+
+sector_proj_col<-function(data_sent,inventory_sent=inventory,project_sent=project_case,cut_year=nir_year,
+                            sector_sent="Oil and Gas",file_sent="images/oil_proj.png",dpi=300){
+  #data_sent<-proj_data
+  cases<-c(inventory_sent,project_sent)
+  data_sent%>% filter(scenario %in% cases & prov !="Canada" & sector==sector_sent)%>%
+    filter((scenario==project_case & year>cut_year)|(scenario==inventory & year<=cut_year))%>%
+    
+    ggplot()+
+    geom_col(aes(year,ifelse(scenario==inventory,emissions,NA),fill=prov),color="black",position = "stack",linewidth=0.1)+
+    geom_col(aes(year,emissions,fill=prov),color="black",position = "stack",linewidth=0.1,alpha=0.4)+
+    scale_x_continuous(breaks=pretty_breaks(n=15))+
+    #scale_fill_viridis("",discrete=TRUE,option="mako")+
+    scale_fill_manual("",values=colors_tableau10())+
+    scale_colour_manual("",values="black",guide = "legend")+
+    proj_graph()+
+    proj_labs+
+    theme(axis.text.x = element_text(size = 12, colour = "black",angle = 0, hjust=0.5,vjust=0.5))+
+    labs(title=paste("Canadian GHG Emissions from ",sector_sent,sep=""))
+  ggsave(file_sent,dpi = 300,width=14, height=7,bg="white")
+}
+sector_proj_col(proj_data,sector_sent = "Electricity",file_sent = "images/power_proj_col.png")
 
 sector_proj_graph(proj_data,sector_sent = "Oil and Gas",file_sent = "images/oil_proj.png")
 sector_proj_graph(proj_data,sector_sent = "Transportation",file_sent = "images/transp_proj.png")
@@ -1121,6 +1148,7 @@ sector_proj_graph(proj_data,sector_sent = "Agriculture",file_sent = "images/agri
 prov_proj_graph<-function(data_sent,inventory_sent=inventory,project_sent=project_case,cut_year=nir_year,
                             prov_name="Alberta",prov_sent="AB",file_sent="images/AB_proj.png",dpi=300){
   #data_sent<-proj_data
+  #project_sent<-ref_case
   cases<-c(inventory_sent,project_sent)
   data_sent%>% filter(scenario %in% cases & sector %in% main_sectors & prov==prov_sent)%>%
     filter((scenario==project_case & year>cut_year)|(scenario==inventory & year<=cut_year))%>%
@@ -1140,6 +1168,7 @@ prov_proj_graph<-function(data_sent,inventory_sent=inventory,project_sent=projec
 }
 
 prov_proj_graph(proj_data,prov_name="Alberta",prov_sent = "AB",file_sent = "images/AB_proj.png")
+#prov_proj_graph(proj_data,prov_name="Alberta",prov_sent = "AB",file_sent = "images/AB_proj.png",project_sent=ref_case)
 
 prov_proj_graph(proj_data,prov_name="Ontario",prov_sent = "ON",file_sent = "images/ON_proj.png")
 
@@ -1795,90 +1824,132 @@ targets_graph<-
   geom_line(data=filter(cdn_data,grepl('NIR', scenario)),aes(year,emissions),color="black",size=1.45)+
   #scale_linetype_manual("",values=c("solid","31"))+
   geom_point(data=targets,aes(Year,target),size=5,colour=palette[9])+
-  geom_point(aes(2000,603.22),size=5,colour=palette[9])+ #rio target
+  geom_point(aes(2000,588.6),size=5,colour=palette[9])+ #rio target
   scale_color_manual("",values=palette[-1])+
   annotate("text",x=1990+(2019-1990)/2,y=790,label="National Inventory Emissions (1990-2021)",
            color="black",fontface="bold",hjust=0.5)+
-  #Rio
-  annotate("text",x=2001,y=603.22,label="Rio Target (return to 1990 levels by 2000)",
-           colour=palette[9],fontface="bold",hjust=0)+
+  #Rio 
+  annotate("text",x=2000,y=630,label="Rio Target\n(return to 1990 levels by 2000)",
+           colour=palette[9],fontface="bold",hjust=0.5)+
   #kyoto
   #geom_point(aes(2010,565),size=5,colour=palette[9])+ #kyoto target
-  geom_errorbarh(aes(xmin=2008,y=565,xmax=2012),height=40,size=2,colour=palette[9])+
-  annotate("text",x=2007,y=565,label="Kyoto Target (6% below 1990 levels, 2008-12)",
+  geom_errorbarh(aes(xmin=2008,y=588.6*.94,xmax=2012),height=40,size=2,colour=palette[9])+
+  annotate("text",x=2007,y=588.6*.94,label="Kyoto Target (6% below 1990 levels, 2008-12)",
            colour=palette[9],fontface="bold",hjust=1)+
   #copenhagen
-  annotate("text",x=2021,y=607.32,label="Copenhagen Target (17% below 2005 levels by 2020)",
-           colour=palette[9],fontface="bold",hjust=0)+
+  annotate("text",x=2014.5,y=732.218*.83,label="Copenhagen Target\n(17% below 2005 levels by 2020)",
+           colour=palette[9],fontface="bold",hjust=.5)+
   #paris
-  annotate("text",x=2029,y=512.9,label="Paris Target (30% below 2005 levels by 2030)",
+  annotate("text",x=2029,y=732.218*.7,label="Paris Target (30% below 2005 levels by 2030)",
            colour=palette[9],fontface="bold",hjust=1)+
   #glasgow
   #geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
-  geom_errorbar(aes(x=2030,ymax=443,ymin=406.3),width=1.4,size=2,colour=palette[9])+
-  annotate("text",x=2029,y=423,label="Glasgow Target (40-45% below 2005 levels by 2030)",
+  geom_errorbar(aes(x=2030,ymax=732.218*.6,ymin=732.218*.55),width=1.4,size=2,colour=palette[9])+
+  annotate("text",x=2029,y=732.218*.575,label="Glasgow Target (40-45% below 2005 levels by 2030)",
            colour=palette[9],fontface="bold",hjust=1)+
   #2050
-  annotate("text",x=2049,y=30,label="2050 Net Zero Goal",
+  annotate("text",x=2049.5,y=-12,label="2050 Net Zero Goal",
            colour=palette[9],fontface="bold",hjust=1)+
   
   geom_hline(yintercept=0,size=1)+
-  scale_y_continuous(limit=c(0,825))+
+  #scale_y_continuous(limit=c(-10,825),expand = c(0,0))+
   scale_x_continuous(limit=c(1990,2052),breaks=seq(1990,2050,10),expand = c(0,0))+
   tombe_theme()+theme(legend.position = "none")+
   labs(x="",y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
-       )
+       )+
+  coord_cartesian(clip = 'off')
 
 targets_graph+ 
   labs(title="Canada's GHG Emissions, Projections and Future Targets",
        subtitle="Source: Environment and Climate Change Canada Emissions Inventory (2023) and BR5 Projections (2023).")+
-  annotate("text",x=2031,y=660,label="2022 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)
-ggsave("images/emissions_and_targets_simple.png",bg="white",dpi=300,width=13,height=6)
+  annotate("text",x=2035.2,y=621,label="2022 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)
+ggsave("images/emissions_and_targets_simple.png",bg="white",dpi=300,width=15,height=7)
 
 
 targets_graph+ 
   labs(subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2022).")+
-  annotate("text",x=2036,y=631,label="2022 ECCC Reference Case (2020-2035)",color="black",fontface="bold",hjust=0)
-ggsave("images/emissions_and_targets_ppt.png",bg="white",dpi=300,width=14,height=7)
+  annotate("text",x=2035.2,y=621,label="2022 ECCC Reference Case (2020-2035)",color="black",fontface="bold",hjust=0,vjust=1)
+ggsave("images/emissions_and_targets_ppt.png",bg="white",dpi=300,width=15,height=7)
 
 
-targets_graph+annotate("text",x=2035.7,y=675,label="2021 Reference Cases",color="black",fontface="bold",hjust=0)+
+targets_graph+
+  annotate("text",x=2035.2,y=621,label="2022 Reference Case",color="black",fontface="bold",hjust=0)+
   labs(title="Canada's GHG Emissions, Projections and Future Targets",
        subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2022).")+
-      annotate("text",x=2032.18,y=675,label="2019 and ",color=palette[1],fontface="bold",hjust=0)+
-  geom_line(data=filter(cdn_data,!grepl('Additional', scenario),scenario!="2020 Reference Case",scenario!="National Inventory Emissions (1990-2018)"),
+      annotate("text",x=2031,y=675,label="2019 and ",color=palette[1],fontface="bold",hjust=0)+
+  geom_line(data=filter(cdn_data,!grepl('Additional', scenario),scenario!="2022 Reference Case",!grepl("NIR",scenario))%>%
+              filter(!(scenario=="2020 Reference Case"&year<2020)),
                   aes(year,emissions,colour=scenario),lty="21",size=2)+
-  geom_text(data=cdn_data%>%filter(year==2030,!grepl('Additional', scenario),scenario!="2020 Reference Case",scenario!="2019 Reference Case"),
-            aes(x=2036,y=emissions+(scenario=="2019 Reference Case")*0+(scenario=="2017 Reference Case")*10
-                ,label=scenario,color=scenario))
-ggsave("images/emissions_and_targets_proj.png",bg="white",dpi=300,width=13,height=6)
-
-os_proj<-proj_data_2022%>%filter(subsector_level_2=="Oil Sands",scenario=="2021 Reference Case",region=="Canada",year>=2020)%>%
-  group_by(year,subsector_level_2)%>%summarize(emissions=sum(emissions))
-
-oil_proj<-proj_data_2022%>%filter(sector=="Oil and Gas",scenario=="2021 Reference Case",region=="Canada",year>=2020)%>%
-  group_by(year,sector)%>%summarize(emissions=sum(emissions,na.rm = T))
+  geom_text(data=cdn_data%>%filter(year==2030,!grepl('Additional', scenario),scenario!="2022 Reference Case",scenario!="2019 Reference Case"),
+            aes(x=2031+(scenario=="2020 Reference Case")*3,y=emissions+(scenario=="2019 Reference Case")*0+(scenario=="2017 Reference Case")*10+(scenario=="2021 Reference Case")*(-10)
+                ,label=scenario,color=scenario),hjust=0)
+ggsave("images/emissions_and_targets_proj.png",bg="white",dpi=300,width=15,height=7)
 
 
 
-targets_graph+ annotate("text",x=2031,y=675,label="2021 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
-  geom_line(data=NIR_natl%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[7],size=1.5)+
-  geom_line(data=oil_proj,aes(year,emissions),color=palette[7],size=1.5,linetype="31")+
-  annotate("text",x=2010,y=230,label="Inventory (1990-2020) and projected (2021-2030) emissions from oil and gas",  color=palette[7],fontface="bold",hjust=0)+
 
-  geom_line(data=new_nir%>%filter(sector=="Oil Sands",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=1.5)+
-  geom_line(data=os_proj,aes(year,emissions),color=palette[4],size=1.5,linetype="31")+
-  annotate("text",x=2010,y=130,label="Inventory (1990-2020) and projected (2021-2030) emissions from oil sands",  color=palette[4],fontface="bold",hjust=0)  
+os_proj<-proj_data_2023%>%filter(subsector_level_2=="Oil Sands",scenario%in%c(project_case,ref_case),region=="Canada",year>=nir_year)%>%
+  group_by(year,sector,scenario)%>%summarize(emissions=sum(emissions,na.rm = T))
+
+
+oil_proj<-proj_data_2023%>%filter(sector=="Oil and Gas",scenario%in%c(project_case,ref_case),region=="Canada",year>=nir_year)%>%
+  group_by(year,sector,scenario)%>%summarize(emissions=sum(emissions,na.rm = T))
+
+elec_proj<-proj_data_2023%>%filter(sector=="Electricity",scenario%in%c(project_case,ref_case),region=="Canada",year>=nir_year)%>%
+  group_by(year,sector,scenario)%>%summarize(emissions=sum(emissions,na.rm = T))
+
+
+
+targets_graph+ annotate("text",x=2035,y=631,label="2022 ECCC Reference Case Projection",color="black",fontface="bold",hjust=0)+
+  geom_line(data=filter(cdn_data,grepl('2022 Additional Measures Scenario', scenario)),aes(year,emissions),lty="21",color="darkgreen",size=2)+
+  annotate("text",x=2036,y=480,label="2022 ECCC Additional Measures Case (2021-2035)",color="darkgreen",fontface="bold",hjust=0)+
   
-ggsave("images/emissions_and_targets_oil.png",bg="white",dpi=600,width=13,height=6)
+  geom_line(data=NIR_natl%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[7],size=1.5)+
+  geom_line(data=oil_proj,aes(year,emissions,group=scenario,lty=scenario),color=palette[7],size=1.5)+
+  annotate("text",x=2010,y=230,label="Inventory (1990-2021) and projected (2022-2035) emissions from oil and gas",  color=palette[7],fontface="bold",hjust=0)+
+  annotate("text",x=2036,y=179,label="2022 ECCC Reference Case (2021-2035)",color=palette[7],fontface="bold",hjust=0)+
+  annotate("text",x=2036,y=130,label="2022 ECCC Additional Measures Case (2021-2035)",color=palette[7],fontface="bold",hjust=0)+
+  
+  
+  #geom_line(data=new_nir%>%filter(sector%in% c("Oil Sands","Oil Sands (Mining, In-Situ, Upgrading)"),Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=1.5)+
+  #geom_line(data=os_proj,aes(year,emissions,group=scenario,lty=scenario),color=palette[4],size=1.5)+
+  #annotate("text",x=2010,y=130,label="Inventory (1990-2021) and projected (2021-2035)emissions from oil sands",  color=palette[4],fontface="bold",hjust=0)  +
+  scale_linetype_manual("",values=c("11","22"))
 
-targets_graph+ annotate("text",x=2031,y=675,label="2020 ECCC Reference Case Projection (2021-2030)",color="black",fontface="bold",hjust=0)+
+  
+ggsave("images/emissions_and_targets_oil.png",bg="white",dpi=200,width=15,height=7)
+
+
+
+targets_graph+ annotate("text",x=2035,y=631,label="2022 ECCC Reference Case Projection",color="black",fontface="bold",hjust=0)+
+  geom_line(data=filter(cdn_data,grepl('2022 Additional Measures Scenario', scenario)),aes(year,emissions),lty="21",color="darkgreen",size=2)+
+  annotate("text",x=2036,y=480,label="2022 ECCC Additional Measures Case (2021-2035)",color="darkgreen",fontface="bold",hjust=0)+
+  
+  geom_line(data=NIR_natl%>%filter(sector=="Electricity",Prov=="Canada"),aes(Year,GHGs),color=palette[7],size=1.5)+
+  geom_line(data=elec_proj,aes(year,emissions,group=scenario,lty=scenario),color=palette[7],size=1.5)+
+  annotate("text",x=2010,y=160,label="Inventory (1990-2021) and projected (2022-2035) emissions from electricity",  color=palette[7],fontface="bold",hjust=0)+
+  annotate("text",x=2035.1,y=30,label="2022 ECCC Reference Case (2021-2035)",color=palette[7],fontface="bold",hjust=0,angle=10)+
+  annotate("text",x=2035.1,y=8,label="2022 ECCC Additional Measures Case (2021-2035)",color=palette[7],fontface="bold",hjust=0,angle=10)+
+  
+  
+  #geom_line(data=new_nir%>%filter(sector%in% c("Oil Sands","Oil Sands (Mining, In-Situ, Upgrading)"),Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=1.5)+
+  #geom_line(data=os_proj,aes(year,emissions,group=scenario,lty=scenario),color=palette[4],size=1.5)+
+  #annotate("text",x=2010,y=130,label="Inventory (1990-2021) and projected (2021-2035)emissions from oil sands",  color=palette[4],fontface="bold",hjust=0)  +
+  scale_linetype_manual("",values=c("11","22"))
+
+
+ggsave("images/emissions_and_targets_elec.png",bg="white",dpi=200,width=15,height=7)
+
+
+
+
+targets_graph+ annotate("text",x=2031,y=675,label="2022 ECCC Reference Case Projection (2022-2035)",color="black",fontface="bold",hjust=0)+
   geom_line(data=new_nir%>%filter(sector=="Oil Sands",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=2)+
   #geom_line(data=new_nir%>%filter(sector=="Oil and Gas",Prov=="Canada"),aes(Year,GHGs),color=palette[4],size=2)+
   #geom_line(data=filter(proj_data,sector=="Oil and Gas",scenario=="NIR 2022",Prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="solid")+
   #geom_line(data=proj_data%>%filter(sector=="Oil and Gas",scenario=="2020 Reference Case",prov=="Canada"),aes(year,emissions),color=palette[4],size=2,linetype="11")+
   #geom_point(aes(2030,100),size=3,colour=palette[4])+ #rio target
-  annotate("text",x=2029,y=120,label="ECCC (2022) oil sands emissions (1990-2020) and 2030 projection",
+  annotate("text",x=2029,y=120,label="ECCC (2023) oil sands emissions (1990-2021) and 2035 projection",
            colour=palette[4],fontface="bold",hjust=1)
   ggsave("images/emissions_and_targets_oil_sands.png",bg="white",dpi=300,width=13,height=6)
 
