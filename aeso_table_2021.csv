@@ -1,0 +1,21 @@
+X1,X2,X3,X4
+Unit Name,Capacity (MW),Conversion Year,Retirement Year
+Battle River 4,,"Partial conversion to gas,",
+,155,,2025
+,,no full conversion assumed,
+Battle River 5,385,2020,2032
+Genesee 1,400,2021,2036
+Genesee 2,400,2021,2036
+Genesee 3,466,2021,2037
+Keephills 1,395 MW in 2021 and 70 MW,"No full conversion, only partial",
+,,,2029
+,in 2022 and onwards,conversion assumed,
+Keephills 2,395,2021,2034
+Keephills 3,463,2021,2037
+Sundance 4,406 MW in 2021 and 113 MW,"No full conversion, only partial",
+,,,2027
+,in 2022 onwards,conversion assumed,
+Sundance 5,406,2022,2033
+Sundance 6,401,2020,2033
+Sheerness 1,400,2021,2035
+Sheerness 2,400,2020,2035
