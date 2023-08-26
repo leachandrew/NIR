@@ -17,23 +17,23 @@ options(scipen=999)
 
 get_data<-function() {
   file_path<-"nir_electricity.xlsx"
-  download.file("https://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/C-Tables-Electricity-Canada-Provinces-Territories/EN_Electricity_Can_Prov_Terr.xlsx",file_path,mode="wb")
+  #download.file("https://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/C-Tables-Electricity-Canada-Provinces-Territories/EN_Electricity_Can_Prov_Terr.xlsx",file_path,mode="wb")
   #get the listing of sheets
   sheet_names<-excel_sheets(file_path)
   index_val<-1
   prov_list<-list()
   for(target_sheet in sheet_names){
-  #target_sheet<-sheet_names[7]
+  #target_sheet<-sheet_names[1]
   prov<-read_excel(file_path,target_sheet,range = "B1",col_names = FALSE)%>%
     rename(province=1)%>%
     mutate(province=gsub("Table A11-13: Electricity Generation and GHG Emission Details for the Nunavut","Nunavut",province),
            province=gsub("Electricity Generation and GHG Emission Details for ","",province))%>%
     as.character()
   print(prov)
-  col_names<-read_excel(file_path,target_sheet,range = "B3:T3",col_names = FALSE)
+  col_names<-read_excel(file_path,target_sheet,range = "B3:U3",col_names = FALSE)
   col_names[1]<-"fuel"
   col_names<-gsub("a","",col_names)
-  elec_data<-read_excel(file_path,target_sheet,range = "B6:T11",col_names = FALSE,
+  elec_data<-read_excel(file_path,target_sheet,range = "B6:U11",col_names = FALSE,
                         na = c("N/A", "n/a","x","**"))
   names(elec_data)<-as.character(col_names)
   
@@ -51,7 +51,7 @@ get_data<-function() {
     pivot_longer(-c(fuel,prov),names_to = "year",values_to = "ghg")%>%
     mutate(year=as.numeric(year))
   
-  gen_data<-read_excel(file_path,target_sheet,range = "B15:T23",col_names = FALSE,
+  gen_data<-read_excel(file_path,target_sheet,range = "B15:U23",col_names = FALSE,
                        na = c("N/A", "n/a","x","**"))
   names(gen_data)<-as.character(col_names)
   gen_data <-gen_data %>% 
@@ -89,66 +89,82 @@ get_data<-function() {
   
   
   prov_data<-bind_rows(prov_list)
-  
-  prov_data<-prov_data%>%
-    mutate(prov=fct_recode(prov,"AB"="Alberta",
-                           "BC"="British Columbia",
-                           "NL"="Newfoundland and Labrador",
-                           "MB"="Manitoba",
-                           "SK"="Saskatchewan",
-                           "NS"="Nova Scotia",
-                           "ON"="Ontario",
-                           "NT"="Northwest Territories",
-                           "NT"="the Northwest Territories",
-                           "QC"="Quebec",
-                           "NU"="Nunavut",
-                           "NB"="New Brunswick",
-                           "YT"="Yukon",
-                           "PE"="Prince Edward Island",
-                           "NT & NU"="Northwest Territories and Nunavut"),
-           prov=fct_collapse(prov,
-                      "TERR" = c("NT", "NU","YT","NT & NU"),
-                      "ATL" = c("NL", "NB","NS","PE")),
-           fuel=fct_other(fuel,drop=c("Other Fuel","Other Generation"))
-           )%>%
-    group_by(prov,year,fuel)%>%
-    summarize(ghg=sum(ghg,na.rm=T),gen=sum(gen,na.rm=T))%>%
-    ungroup()%>%
-    mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
-  
-  prov_data <- prov_data %>%
-    mutate(fuel=fct_recode(fuel,"Non-hydro Renewables"="Other Renewables"),
-           fuel=fct_relevel(fuel,"Nuclear",after=0),
-           fuel=fct_relevel(fuel,"Non-hydro Renewables",after=0),
-           fuel=fct_relevel(fuel,"Hydro",after=0)
-           )
-
   prov_data
 }
 
-prov_data<-get_data()
+#all_provs_data<-get_data()
+#save(all_provs_data,file = "prov_elec.Rdata")
+
+load(file = "prov_elec.Rdata")
+
+prov_data<-all_provs_data%>%
+  mutate(prov=fct_recode(prov,"AB"="Alberta",
+                         "BC"="British Columbia",
+                         "NL"="Newfoundland and Labrador",
+                         "MB"="Manitoba",
+                         "SK"="Saskatchewan",
+                         "NS"="Nova Scotia",
+                         "ON"="Ontario",
+                         "NT"="Northwest Territories",
+                         "NT"="the Northwest Territories",
+                         "QC"="Quebec",
+                         "NU"="Nunavut",
+                         "NB"="New Brunswick",
+                         "YT"="Yukon",
+                         "PE"="Prince Edward Island",
+                         "NT & NU"="Northwest Territories and Nunavut",
+                         "NU"="the Nunavut"),
+         prov=fct_collapse(prov,
+                           "TERR" = c("NT", "NU","YT","NT & NU"),
+                           #"MARITIMES" = c("NB","NS","PE")
+         )#,
+         #fuel=fct_other(fuel,drop=c("Other Fuel","Other Generation")
+         )%>%
+  group_by(prov,year,fuel)%>%
+  summarize(ghg=sum(ghg,na.rm=T),gen=sum(gen,na.rm=T))%>%
+  ungroup()%>%
+  mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON", "QC","NL","NB","NS","PE","TERR"  )))
+
+prov_data <- prov_data %>%
+  mutate(fuel=fct_recode(fuel,"Non-hydro Renewables"="Other Renewables"),
+         fuel=fct_relevel(fuel,"Nuclear",after=0),
+         fuel=fct_relevel(fuel,"Non-hydro Renewables",after=0),
+         fuel=fct_relevel(fuel,"Hydro",after=0)
+  )
+
+
+prov_data<-prov_data %>% group_by(prov,year)%>%mutate(ci=sum(ghg)/sum(gen))
+
+ci_data<-prov_data %>% group_by(prov,year)%>%summarize(ci=sum(ghg)/sum(gen))
+scale_fac<-200
   
-  elec_provs<-ggplot(prov_data %>% filter(year==2020,prov!="Canada",!fuel%in%c("Combustion","Overall Total")))+
+  elec_provs<-ggplot(prov_data %>% filter(year==2021,prov!="Canada",!fuel%in%c("Combustion","Overall Total")))+
     #geom_col(aes(prov,ghg,group=fuel,fill=fuel),position = "stack")+
     geom_col(aes(prov,gen/1000,group=fuel,fill=fuel),position = "stack",colour="black",size=.6)+
     #geom_line(data=prov_data %>% filter(year==2020,prov!="Canada",fuel=="Overall Total"),
     #          aes(prov,ghg/1000*5,group=year,color="GHG Emissions (right axis)"),size=1.25)+
-    geom_point(data=prov_data %>% filter(year==2020,prov!="Canada",fuel=="Overall Total"),
-            aes(prov,ghg/1000*5,group=year,color="GHG Emissions (right axis)"),size=4.5,
+    geom_point(data=ci_data %>% filter(year==2021,prov!="Canada"),
+            aes(prov,ci*scale_fac,group=year,color="2021 Emissions Intensity (right axis)"),size=4.5,
             shape=21, stroke=2, fill="white")+
+    geom_point(data=ci_data %>% filter(year==1990,prov!="Canada"),
+               aes(prov,ci*scale_fac,group=year,color="1990 Emissions Intensity (right axis)"),size=4.5,
+               shape=21, stroke=2, fill="white")+
+    geom_point(data=ci_data %>% filter(year==2005,prov!="Canada"),
+               aes(prov,ci*scale_fac,group=year,color="2005 Emissions Intensity (right axis)"),size=4.5,
+               shape=21, stroke=2, fill="white")+
     scale_y_continuous(
       # Features of the first axis
       name = expression('Electricity Generation  '*'(TWh)'),
       # Add a second axis and specify its features
-      sec.axis = sec_axis( trans=~./5, name=expression('Emissions from Electricity Generation  '*'(MtCO'[2]*'e)'))
+      sec.axis = sec_axis( trans=~./scale_fac, name=expression('Electricity Emissions Intensity  '*'(tCO'[2]*'e/MWh)'))
     )+
   #scale_fill_viridis("",discrete=TRUE,option="B")+
-  scale_fill_manual("",values=c(colors_ua10()[4],colors_ua10()[1],viridis(10,option="C",direction = 1,alpha = .5)[8],"grey20","grey40","white"))+
-  scale_colour_manual("",values="red",guide = "legend")+
-  guides(color=guide_legend(nrow =1,byrow=FALSE,label.theme=element_text(colour='red')))+
+    scale_fill_manual("",values=c(colors_ua10()[4],colors_ua10()[1],viridis(10,option="cividis",direction = 1,alpha = .5)[9],"grey20","grey40",viridis(10,option="cividis",direction = 1,alpha = .5)[7]))+
+    scale_colour_manual("",values=c("red","orange","black"),guide = "legend")+
+  guides(color=guide_legend(ncol =1,byrow=FALSE,label.theme=element_text(colour='red')))+
     theme_tufte()+
   theme(
-      legend.position = c(.85, .7),
+      legend.position = c(.86, .75),
       legend.margin=margin(c(.05,0,.05,0),unit="cm"),
       legend.text = element_text(colour="black", size = 12),
       plot.caption = element_text(size = 10, face = "italic",hjust=0),
@@ -171,29 +187,78 @@ prov_data<-get_data()
          NULL
     )
   elec_provs
-  ggsave("images/prov_elec_col.png",width = 14,height=7,dpi=300,bg="white")
+    ggsave("images/prov_elec_col.png",width = 14.5,height=7,dpi=300,bg="white")
 
   elec_provs+
     labs(
-       caption="Source: Environment and Climate Change Canada 2022 National Inventory. Graph by @andrew_leach.",
+       caption="Data via Environment and Climate Change Canada 2023 National Inventory Report, graph by @andrew_leach.",
        NULL
   )
-  ggsave("images/prov_elec_col_caption.png",width = 14,height=7,dpi=300,bg="white")
+  ggsave("images/prov_elec_col_caption.png",width = 14.5,height=7,dpi=300,bg="white")
   
   
-    
   
-  elec_provs+
-    scale_fill_manual("",values=c("white","grey50","grey75","black","grey20","grey90"))+
-    scale_colour_manual("",values="grey30",guide = "legend")+
-    guides(color=guide_legend(nrow =1,byrow=FALSE,label.theme=element_text(colour='grey30')))+
+  ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada","TERR","PE"),!fuel%in%c("Combustion","Overall Total","Other Generation"))%>%
+           mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON","QC","NL","NB","NS","PE","TERR"))))+
+    #geom_col(aes(prov,ghg,group=fuel,fill=fuel),position = "stack")+
+    geom_col(aes(prov,gen/1000,group=fuel,fill=fuel),position = "stack",colour="black",size=.2,width = .8)+
+    #geom_line(data=prov_data %>% filter(year==2020,prov!="Canada",fuel=="Overall Total"),
+    #          aes(prov,ghg/1000*5,group=year,color="GHG Emissions (right axis)"),size=1.25)+
+    geom_point(data=ci_data %>% filter(year==2021,!prov%in%c("Canada","TERR","PE"),),
+               aes(prov,ci*scale_fac,group=year,color="2021 Emissions Intensity (right axis)"),size=3,
+               shape=21, stroke=2, fill="white")+
+    geom_point(data=ci_data %>% filter(year==1990,!prov%in%c("Canada","TERR","PE")),
+               aes(prov,ci*scale_fac,group=year,color="1990 Emissions Intensity (right axis)"),size=3,
+               shape=21, stroke=2, fill="white")+
+    #geom_point(data=ci_data %>% filter(year==2005,!prov%in%c("Canada","TERR","PE")),
+    #           aes(prov,ci*scale_fac,group=year,color="2005 Emissions Intensity (right axis)"),size=3,
+    #           shape=21, stroke=2, fill="white")+
+    scale_y_continuous(
+      # Features of the first axis
+      name = expression('Generation  '*'(TWh)'),
+      # Add a second axis and specify its features
+      sec.axis = sec_axis( trans=~./scale_fac, name=expression('Emissions Intensity  '*'(tCO'[2]*'e/MWh)'))
+    )+
+    theme_tufte()+
     theme(
-      text = element_text(size = 20,family="Times New Roman MS"),
-      axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="grey30"),
-      axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="grey30")
+      legend.position = "bottom",
+      #legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+      legend.text = element_text(colour="black", size = 12),
+      plot.caption = element_text(size = 10, face = "italic",hjust=0),
+      plot.title = element_text(size=16,face = "bold"),
+      plot.subtitle = element_text(size = 10),
+      #panel.grid.minor = element_blank(),
+      axis.text.y = element_text(size = 12, colour="black"),
+      axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
+      axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
+      #axis.text.x = element_blank(),
+      axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
+      axis.title.y = element_text(size = 14, colour="black"),
+      axis.ticks = element_blank(),
+      text = element_text(size = 20,family="Times New Roman MS")
+    )+
+    labs(x=NULL,
+         #title="Electricity Generation and GHG Emissions by Province (2020)",
+         #subtitle=paste("2022 National Inventory (2020 emissions)",sep=""),
+         #caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory. Graph by @andrew_leach.",width = 180),
+         NULL
+    )+
+    scale_fill_manual("",values=c("white","grey20","grey80","black","grey60","grey90"))+
+    scale_colour_manual("",values=c("grey65","black"),guide = "legend")+
+    guides(color=guide_legend(nrow =3,byrow=FALSE,label.theme=element_text(colour='grey30')),
+           fill=guide_legend(nrow=3))+
+    theme(
+      text = element_text(size = 18,family="Times New Roman MS"),
+      axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+      axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+      axis.text.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+      axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black")
       )
-  ggsave("images/prov_elec.png",width = 14,height=7,dpi=300,bg="white")
-  ggsave("images/prov_elec.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+  ggsave("images/prov_elec_bw.png",width = 8,height=8,dpi=600,bg="white")
+  ggsave("images/prov_elec_bw.tiff",width = 8,height=8,dpi=600,bg="white")
+  
+  
+  ggsave("images/prov_elec.eps",width = 7,height=5,dpi=300,bg="white",device=cairo_ps)
 
   
   
@@ -255,6 +320,37 @@ prov_data<-get_data()
   
   ggsave("images/prov_elec_2015.png",width = 14,height=7,dpi=300,bg="white")
   ggsave("images/prov_elec_2015.eps",width = 14,height=7,dpi=300,bg="white",device=cairo_ps)
+  
+  
+  
+  proj_graph<-function(){
+    theme_minimal()+theme(
+      legend.position = "right",
+      legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+      legend.text = element_text(colour="black", size = 12),
+      plot.caption = element_text(size = 10, face = "italic",hjust=0),
+      plot.title = element_text(size=16,face = "bold"),
+      plot.subtitle = element_text(size = 10),
+      panel.grid.minor = element_blank(),
+      text = element_text(size = 20,face = "bold"),
+      axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+      #axis.text.x = element_blank(),
+      axis.text.x = element_text(size = 12, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+      strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+      axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+    )
+    
+  }
+  prov_plot<-  
+    ggplot(data = prov_data %>% filter(prov !="Canada",fuel!="Combustion",,fuel!="Overall Total"))+
+    geom_area(aes(year,gen/1000,fill=fuel),color="black",position = "stack",size=0.1,alpha=.8)+
+    facet_wrap( ~ prov,nrow = 1)+
+    scale_x_continuous(breaks=pretty_breaks())+
+    scale_fill_manual("",values=c(colors_ua10()[4],colors_ua10()[1],viridis(10,option="cividis",direction = 1,alpha = .5)[9],"grey20","grey40",viridis(10,option="cividis",direction = 1,alpha = .5)[7]))+
+    scale_colour_manual("",values="black",guide = "legend")+
+    proj_graph()+#proj_labs+
+    NULL
+  
   
   
   
@@ -579,7 +675,7 @@ ggplot(ggppa_comp)+
        NULL
   )
 
-ggsave("images/ccir_ggppa_ctf.png",width = 7.5,height=4.5,dpi=220,bg="white")
+ggsave("images/ccir_ggppa_ctf.png",width = 7.5,height=4.5,dpi=300,bg="white")
 
 
 
@@ -596,236 +692,6 @@ ggplot(mark)+
 
 
 #"actual"                                                    "legislated_milestones"                                    
-
-
-library(cansim)
-lfs<-get_cansim("1410002301")%>% clean_names()
-
-fish<-lfs %>% filter(grepl("Fish",north_american_industry_classification_system_naics) |north_american_industry_classification_system_naics=="Total, all industries")%>%
-  
-oil_gas<-lfs %>% filter(grepl("oil",north_american_industry_classification_system_naics) |north_american_industry_classification_system_naics=="Total, all industries")%>%
-  
-  
-  #SEPH Statistics Canada Table 
-  
-seph<-get_cansim("14-10-0202-01") %>% clean_names()
-
-seph_oil_gas<-seph %>% filter(grepl("Mining",north_american_industry_classification_system_naics)|grepl("transportation \\[486\\]",north_american_industry_classification_system_naics)|grepl("for mining",north_american_industry_classification_system_naics) |grepl("Oil and gas extraction",north_american_industry_classification_system_naics)|
-                                grepl("Petroleum, petroleum products, and other hydrocarbons merchant wholesalers",north_american_industry_classification_system_naics)|
-                                grepl("Petroleum and coal product manufacturing",north_american_industry_classification_system_naics)|
-                                grepl("Natural gas distribution",north_american_industry_classification_system_naics)|
-                                grepl("Gasoline stations and fuel vendors",north_american_industry_classification_system_naics)            )%>%
-  select(ref_date,geo,north_american_industry_classification_system_naics,hierarchy_for_geo,type_of_employee,hierarchy_for_type_of_employee,date,value,val_norm,uom)%>%
-  mutate(geo=factor(geo),
-  geo=fct_recode(geo,"AB"="Alberta",
-                  "BC"="British Columbia",
-                  "NL"="Newfoundland and Labrador",
-                  "MB"="Manitoba",
-                  "SK"="Saskatchewan",
-                  "NS"="Nova Scotia",
-                  "ON"="Ontario",
-                  "NT"="Northwest Territories",
-                  "QC"="Quebec",
-                  "NU"="Nunavut",
-                  "NB"="New Brunswick",
-                  "YT"="Yukon",
-                  "PE"="Prince Edward Island",
-                  "NT & NU"="Northwest Territories and Nunavut",
-                  "NT & NU"="Northwest Territories including Nunavut"),
-  geo=fct_collapse(geo,
-                  "TERR" = c("NT", "NU","YT","NT & NU"),
-                  "ATL" = c("NL", "NB","NS","PE")))%>%
-  group_by(geo,type_of_employee,north_american_industry_classification_system_naics)%>%
-  fill(value)%>%
-  group_by(geo,type_of_employee,north_american_industry_classification_system_naics,date,ref_date)%>%
-  summarize(value=sum(value,na.rm=T))%>%
-  mutate(geo=factor(geo,levels = (c("Canada","BC","AB","SK","MB","ON","QC","NB", "NS", "PE", "NL","ATL","OTHER ATL","TERR"))))
-  
-ggplot(seph_oil_gas%>%
-       filter(type_of_employee=="All employees",
-                             #geo%in%c("BC","AB","SK","ATL"),
-                              geo!="Canada",
-                             !grepl("Mining, quarrying",north_american_industry_classification_system_naics),
-                             !grepl("Pipeline",north_american_industry_classification_system_naics))%>%
-         I())+
-  geom_col(aes(date,value/1000,group=north_american_industry_classification_system_naics,fill=north_american_industry_classification_system_naics),
-           position = "stack",colour="black",size=.25)+
-  facet_wrap(~geo,nrow = 1)+
-  guides(fill=guide_legend(ncol = 2))+
-  expand_limits(y=130)+
-  scale_y_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  scale_x_date(breaks=pretty_breaks(6),expand = c(0,0),date_labels="%Y")+ 
-  theme_minimal()+theme(
-    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
-    legend.title=element_blank(),
-    legend.position="bottom",
-    legend.margin=margin(c(0,0,0,0),unit="cm"),
-    legend.spacing.x = unit(0.2, 'cm'),
-    legend.spacing.y = unit(0.2, 'cm'),
-    legend.text = element_text(colour="black", size = 8),
-    plot.caption = element_text(size =8),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size =8, face = "italic"),
-    #text=element_text(family="Times", face="bold", size=8),
-    #text = element_text(family=windowsFont("Times"),size = 8,face = "bold"),
-    axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5),
-    #axis.title = element_text(size = 8,face = "bold", colour="black"),
-    panel.spacing = unit(.75, "lines"))+    
-  labs(x=NULL,y="Thousands of persons employed",
-       #title="Electricity Generation and GHG Emissions by Province (2020)",
-       #subtitle=paste("2022 National Inventory (2020 emissions)",sep=""),
-       caption=str_wrap("Source: Statistics Canada. Table 14-10-0202-01 Employment by industry, annual, via Survey of Employment, Payrolls and Hours. Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-
-ggsave("images/o_g_jobs.png",width = 9.5,height=5.5,dpi=220,bg="white")
-
-
-ggplot(seph_oil_gas%>%
-         filter(type_of_employee!="All employees",
-                #geo%in%c("BC","AB","SK","ATL"),
-                geo!="Canada",
-                !grepl("Mining, quarrying",north_american_industry_classification_system_naics),
-                !grepl("Pipeline",north_american_industry_classification_system_naics))%>%
-         I())+
-  geom_col(aes(date,value/1000,group=north_american_industry_classification_system_naics,fill=north_american_industry_classification_system_naics),
-           position = "stack",colour="black",size=.25)+
-  facet_grid(rows = vars(type_of_employee),cols = vars(geo))+
-  guides(fill=guide_legend(ncol = 2))+
-  expand_limits(y=130)+
-  scale_y_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  scale_x_date(breaks=pretty_breaks(6),expand = c(0,0),date_labels="%Y")+ 
-  theme_minimal()+theme(
-    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
-    legend.title=element_blank(),
-    legend.position="bottom",
-    legend.margin=margin(c(0,0,0,0),unit="cm"),
-    legend.spacing.x = unit(0.2, 'cm'),
-    legend.spacing.y = unit(0.2, 'cm'),
-    legend.text = element_text(colour="black", size = 8),
-    plot.caption = element_text(size =8),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size =8, face = "italic"),
-    #text=element_text(family="Times", face="bold", size=8),
-    #text = element_text(family=windowsFont("Times"),size = 8,face = "bold"),
-    axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5),
-    #axis.title = element_text(size = 8,face = "bold", colour="black"),
-    panel.spacing = unit(.75, "lines"))+    
-  labs(x=NULL,y="Thousands of persons employed",
-       #title="Electricity Generation and GHG Emissions by Province (2020)",
-       #subtitle=paste("2022 National Inventory (2020 emissions)",sep=""),
-       caption=str_wrap("Source: Statistics Canada. Table 14-10-0202-01 Employment by industry, annual, via Survey of Employment, Payrolls and Hours. Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-
-ggsave("images/o_g_job_type.png",width = 9.5,height=8.5,dpi=220,bg="white")
-
-
-# earnings
-
-
-
-#seph_earn<-get_cansim("14-10-0203-01") %>% clean_names()
-seph_earn<-get_cansim("14-10-0204-01") %>% clean_names()
-
-oil_gas_earn<-seph_earn %>% filter(grepl("Mining",north_american_industry_classification_system_naics)|grepl("transportation \\[486\\]",north_american_industry_classification_system_naics)|grepl("for mining",north_american_industry_classification_system_naics) |grepl("Oil and gas extraction",north_american_industry_classification_system_naics)|
-                                grepl("Petroleum, petroleum products, and other hydrocarbons merchant wholesalers",north_american_industry_classification_system_naics)|
-                                grepl("Petroleum and coal product manufacturing",north_american_industry_classification_system_naics)|
-                                grepl("Natural gas distribution",north_american_industry_classification_system_naics)|
-                                grepl("Gasoline stations and fuel vendors",north_american_industry_classification_system_naics)|
-                                  grepl("Industrial aggregate excluding unclassified businesses",north_american_industry_classification_system_naics)  |
-                                  grepl("Goods producing industries",north_american_industry_classification_system_naics)                                   )%>%
-  select(ref_date,geo,north_american_industry_classification_system_naics,hierarchy_for_geo,type_of_employees,hierarchy_for_type_of_employees,date,value,val_norm,uom,overtime)%>%
-  mutate(geo=factor(geo),
-         geo=fct_recode(geo,"AB"="Alberta",
-                        "BC"="British Columbia",
-                        "NL"="Newfoundland and Labrador",
-                        "MB"="Manitoba",
-                        "SK"="Saskatchewan",
-                        "NS"="Nova Scotia",
-                        "ON"="Ontario",
-                        "NT"="Northwest Territories",
-                        "QC"="Quebec",
-                        "NU"="Nunavut",
-                        "NB"="New Brunswick",
-                        "YT"="Yukon",
-                        "PE"="Prince Edward Island",
-                        "NT & NU"="Northwest Territories and Nunavut",
-                        "NT & NU"="Northwest Territories including Nunavut"),
-         #geo=fct_collapse(geo,
-        #                  "TERR" = c("NT", "NU","YT","NT & NU"),
-        #                  "ATL" = c("NL", "NB","NS","PE"))
-        )%>%
-  group_by(geo,type_of_employees,overtime,north_american_industry_classification_system_naics)%>%
-  fill(value)%>%
-  group_by(geo,type_of_employees,overtime,north_american_industry_classification_system_naics,date,ref_date)%>%
-  summarize(value=sum(value,na.rm=T))%>%
-  mutate(geo=factor(geo,levels = (c("Canada","BC","AB","SK","MB","ON","QC","NB", "NS", "PE", "NL","ATL","OTHER ATL","TERR"))))
-
-
-ggplot(oil_gas_earn%>%
-         filter(type_of_employees=="All employees",overtime=="Including overtime",
-                geo%in%c("Canada","AB","SK","BC","NL"),
-                #geo=="Canada",
-                TRUE
-                )%>%
-         filter(grepl("Mining, quarrying",north_american_industry_classification_system_naics)|
-                  #grepl("transportation \\[486\\]",north_american_industry_classification_system_naics)|
-                  #grepl("for mining",north_american_industry_classification_system_naics) |
-                  #grepl("Oil and gas extraction",north_american_industry_classification_system_naics)|
-                  #grepl("except oil and gas",north_american_industry_classification_system_naics)|
-                    
-                  #grepl("Petroleum, petroleum products, and other hydrocarbons merchant wholesalers",north_american_industry_classification_system_naics)|
-                  #grepl("Petroleum and coal product manufacturing",north_american_industry_classification_system_naics)|
-                  #grepl("Natural gas distribution",north_american_industry_classification_system_naics)|
-                  #grepl("Gasoline stations and fuel vendors",north_american_industry_classification_system_naics)|
-                  grepl("Industrial aggregate excluding unclassified businesses",north_american_industry_classification_system_naics)  |
-                  grepl("Goods producing industries",north_american_industry_classification_system_naics)                                   )%>%
-         mutate(north_american_industry_classification_system_naics=fct_relevel(north_american_industry_classification_system_naics,
-                                                                                "Goods producing industries [11-33N]"),
-           north_american_industry_classification_system_naics=fct_relevel(north_american_industry_classification_system_naics,
-                                                                                "Industrial aggregate excluding unclassified businesses [11-91N]"))%>%
-         I())+
-  geom_line(aes(date,value,group=north_american_industry_classification_system_naics,color=north_american_industry_classification_system_naics),
-           linewidth=.85)+
-  #facet_grid(rows = vars(type_of_employees),cols = vars(geo))+
-  facet_grid(#rows = vars(type_of_employees),
-    cols = vars(geo))+
-  guides(color=guide_legend(ncol = 3,byrow = T))+
-  expand_limits(y=130)+
-  scale_y_continuous(breaks=pretty_breaks(),expand = c(0,0))+
-  scale_x_date(breaks=pretty_breaks(6),expand = c(0,0),date_labels="%Y")+ 
-  scale_color_grey("")+
-  theme_minimal()+theme(
-    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
-    legend.title=element_blank(),
-    legend.position="bottom",
-    legend.margin=margin(c(0,0,0,0),unit="cm"),
-    legend.spacing.x = unit(0.2, 'cm'),
-    legend.spacing.y = unit(0.2, 'cm'),
-    legend.text = element_text(colour="black", size = 8),
-    plot.caption = element_text(size =8),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_text(size =8, face = "italic"),
-    #text=element_text(family="Times", face="bold", size=8),
-    #text = element_text(family=windowsFont("Times"),size = 8,face = "bold"),
-    axis.text.x = element_text(angle = 90,hjust=0.5,vjust=0.5),
-    #axis.title = element_text(size = 8,face = "bold", colour="black"),
-    panel.spacing = unit(.75, "lines"))+    
-  labs(x=NULL,y="Average Weekly Earnings",
-       #title="Average weekly earnings by industry, monthly, unadjusted for seasonality",
-       #subtitle=paste("2022 National Inventory (2020 emissions)",sep=""),
-       caption=str_wrap("Source: Statistics Canada. Table 14-10-02043-01 Average weekly earnings by industry, annual, via Survey of Employment, Payrolls and Hours. Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-
-ggsave("images/o_g_job_earn.png",width = 9.5,height=5.5,dpi=220,bg="white")
-
-
-  
-#  CENSUS Source: Author's calculations from Statistics Canada census data, Table 98-400-
-# X2016290, as explained in text.
-  
   
   #getting national communication info
   library(tabulizer)
