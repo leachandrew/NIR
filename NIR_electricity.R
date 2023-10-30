@@ -97,6 +97,124 @@ get_data<-function() {
 
 load(file = "prov_elec.Rdata")
 
+# all the provinces and territories
+
+prov_data<-all_provs_data%>%
+  mutate(prov=fct_recode(prov,"AB"="Alberta",
+                         "BC"="British Columbia",
+                         "NL"="Newfoundland and Labrador",
+                         "MB"="Manitoba",
+                         "SK"="Saskatchewan",
+                         "NS"="Nova Scotia",
+                         "ON"="Ontario",
+                         "NT"="Northwest Territories",
+                         "NT"="the Northwest Territories",
+                         "QC"="Quebec",
+                         "NU"="Nunavut",
+                         "NB"="New Brunswick",
+                         "YT"="Yukon",
+                         "PE"="Prince Edward Island",
+                         "NT & NU"="Northwest Territories and Nunavut",
+                         "NU"="the Nunavut"),
+         prov=fct_collapse(prov,
+                           "TERR" = c("NT", "NU","YT","NT & NU"),
+                           #"MARITIMES" = c("NB","NS","PE")
+         )#,
+         #fuel=fct_other(fuel,drop=c("Other Fuel","Other Generation")
+  )%>%
+  group_by(prov,year,fuel)%>%
+  summarize(ghg=sum(ghg,na.rm=T),gen=sum(gen,na.rm=T))%>%
+  ungroup()%>%
+  mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON", "QC","NB","NS","PE","NL","TERR")))
+
+prov_data <- prov_data %>%
+  mutate(fuel=fct_recode(fuel,"Non-hydro Renewables"="Other Renewables"),
+         fuel=fct_relevel(fuel,"Nuclear",after=0),
+         fuel=fct_relevel(fuel,"Non-hydro Renewables",after=0),
+         fuel=fct_relevel(fuel,"Hydro",after=0)
+  )
+
+
+prov_data<-prov_data %>% group_by(prov,year)%>%mutate(ci=sum(ghg)/sum(gen))
+
+ci_data<-prov_data %>% group_by(prov,year)%>%summarize(ci=sum(ghg)/sum(gen))
+scale_fac<-150
+
+library(ggpattern)
+elec_provs<-
+ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada"),!fuel%in%c("Combustion","Overall Total","Other Generation"))%>%
+         mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON","QC","NL","NB","NS","PE","TERR"))))+
+  #geom_col(aes(prov,ghg,group=fuel,fill=fuel),position = "stack")+
+  geom_col_pattern(aes(prov,gen/1000,group=fuel,fill=fuel,pattern=fuel),position = "stack",colour="black",size=.2,width = .8,pattern_spacing = .02)+
+  #geom_line(data=prov_data %>% filter(year==2020,prov!="Canada",fuel=="Overall Total"),
+  #          aes(prov,ghg/1000*5,group=year,color="GHG Emissions (right axis)"),size=1.25)+
+  geom_point(data=ci_data %>% filter(year==2021,!prov%in%c("Canada"),),
+             aes(prov,ci*scale_fac,group=year,color="2021 Emissions Intensity (right axis)"),size=3,
+             shape=21, stroke=2, fill="white")+
+  geom_point(data=ci_data %>% filter(year==1990,!prov%in%c("Canada")),
+             aes(prov,ci*scale_fac,group=year,color="1990 Emissions Intensity (right axis)"),size=3,
+             shape=21, stroke=2, fill="white")+
+  #geom_point(data=ci_data %>% filter(year==2005,!prov%in%c("Canada","TERR","PE")),
+  #           aes(prov,ci*scale_fac,group=year,color="2005 Emissions Intensity (right axis)"),size=3,
+  #           shape=21, stroke=2, fill="white")+
+  scale_y_continuous(
+    # Features of the first axis
+    name = expression('Generation  '*'(TWh)'),
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( trans=~./scale_fac, name=expression('Emissions Intensity  '*'(tCO'[2]*'e/MWh)'))
+  )+
+  theme_tufte()+
+  scale_pattern_manual("",values=c("Hydro"="none","Non-hydro Renewables"= "none", "Natural Gas"="none", "Coal"="none",
+                                   "Other Fuel"="stripe","Nuclear"="crosshatch"))+
+  
+  theme(
+    legend.position = "bottom",
+    #legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    axis.text.y = element_text(size = 12, colour="black"),
+    axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
+    axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="red"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", hjust=0.5,vjust=0.5),
+    axis.title.y = element_text(size = 14, colour="black"),
+    axis.ticks = element_blank(),
+    text = element_text(size = 20,family="Times New Roman MS")
+  )+
+  labs(x=NULL,
+       #title="Electricity Generation and GHG Emissions by Province (2020)",
+       #subtitle=paste("2022 National Inventory (2020 emissions)",sep=""),
+       #caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory. Graph by @andrew_leach.",width = 180),
+       NULL
+  )+
+  scale_fill_manual("",values=c("white","grey20","grey80","black","grey60","grey90"))+
+  scale_colour_manual("",values=c("grey65","black"),guide = "legend")+
+  guides(color=guide_legend(nrow =3,byrow=FALSE,label.theme=element_text(colour='grey30')),
+         fill=guide_legend(nrow=3))+
+  theme(
+    text = element_text(size = 18,family="Times New Roman MS"),
+    axis.text.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+    axis.title.y.right = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+    axis.text.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 2),color="black")
+  )
+
+
+elec_provs+
+  scale_fill_manual("",values=c(colors_ua10()[4],colors_ua10()[1],viridis(10,option="cividis",direction = 1,alpha = .5)[9],"grey20","grey40",viridis(10,option="cividis",direction = 1,alpha = .5)[7]))+
+  labs(
+    caption="Data via Environment and Climate Change Canada 2023 National Inventory Report, graph by @andrew_leach.",
+    NULL
+  )
+ggsave("images/all_prov_elec_col_caption.png",width = 10,height=7,dpi=300,bg="white")
+
+  
+  
+
+
 prov_data<-all_provs_data%>%
   mutate(prov=fct_recode(prov,"AB"="Alberta",
                          "BC"="British Columbia",
@@ -197,7 +315,7 @@ scale_fac<-200
   ggsave("images/prov_elec_col_caption.png",width = 14.5,height=7,dpi=300,bg="white")
   
   
-  remotes::install_github("coolbutuseless/ggpattern")
+  #remotes::install_github("coolbutuseless/ggpattern")
   
   
   ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada","TERR","PE"),!fuel%in%c("Combustion","Overall Total","Other Generation"))%>%
