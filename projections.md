@@ -2,7 +2,7 @@
 
 At irregular intervals, [emissions projections](https://www.canada.ca/en/environment-climate-change/services/climate-change/greenhouse-gas-emissions/projections.html) are released by Environment and Climate Change Canada. I've used some of these projecitons at the national level to show our progress to date, and how far we still have to go to bend the curve.
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
+<a href="images/emissions_and_targets_both.png" target="_blank">
   <img border="0" align="center"  src="images/emissions_and_targets_both.png"/>
 </a>
 
