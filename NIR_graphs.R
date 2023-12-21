@@ -1113,6 +1113,9 @@ inventory="NIR 2023"
 project_case<-"2023 Additional Measures Scenario"
 nir_year<-2021
 
+library(wesanderson)
+
+plot_palette<-wes_palette("BottleRocket2", 8, type = "continuous")
 
 #proj_data<-proj_data %>% filter(year<=2030)
 prov_plot<-  ggplot(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada"))+
@@ -1120,8 +1123,8 @@ prov_plot<-  ggplot(data = proj_data %>% filter(scenario%in% c(inventory,project
             aes(year,emissions,fill=sector),color="black",position = "stack",size=0.5,alpha=.8)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option=viridis_scheme)+
-  #scale_fill_manual("",values=colors_ua10())+
+  #scale_fill_viridis("",discrete=TRUE,option=viridis_scheme)+
+  scale_fill_manual("",values=plot_palette)+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
   proj_plain+
@@ -1229,7 +1232,7 @@ pc_prov_plot<-  ggplot(data = proj_data %>% filter(scenario%in% c(inventory,proj
             aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.5,alpha=.8)+
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option=viridis_scheme)+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values=colors_ua10())+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
@@ -1265,7 +1268,7 @@ sector_plot<-  ggplot()+
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.5,alpha=.8)+
   facet_wrap( ~ sector,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="cividis")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values=colors_ua10())+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+proj_plain+
@@ -1302,7 +1305,7 @@ sector_proj<-
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
   facet_wrap( ~ sector,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
   NULL
@@ -1332,7 +1335,7 @@ ggplot()+
   scale_x_continuous(breaks=pretty_breaks(n=15))+
   #scale_fill_viridis("",discrete=TRUE,option="mako")+
   #scale_fill_viridis("",discrete=TRUE,option="turbo")+
-  scale_fill_brewer("",palette = "Dark2")+
+  scale_fill_manual("",values=plot_palette)+
   
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
@@ -1354,7 +1357,7 @@ sector_proj_col<-function(data_sent,inventory_sent=inventory,project_sent=projec
     geom_col(aes(year,emissions,fill=prov),color="black",position = "stack",linewidth=0.1,alpha=0.4)+
     scale_x_continuous(breaks=pretty_breaks(n=15))+
     #scale_fill_viridis("",discrete=TRUE,option="mako")+
-    scale_fill_manual("",values=colors_tableau10())+
+    scale_fill_manual("",values=plot_palette)+
     scale_colour_manual("",values="black",guide = "legend")+
     proj_graph()+
     proj_labs+
@@ -1384,7 +1387,7 @@ prov_proj_graph<-function(data_sent,inventory_sent=inventory,project_sent=projec
     geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",linewidth=0.1,alpha=0.4)+
     scale_x_continuous(breaks=pretty_breaks(n=15))+
     #scale_fill_viridis("",discrete=TRUE,option="mako")+
-    scale_fill_viridis("",discrete=TRUE,option="cividis")+
+    scale_fill_manual("",values=plot_palette)+
     scale_colour_manual("",values="black",guide = "legend")+
     proj_graph()+
     proj_labs+
@@ -1416,7 +1419,7 @@ prov_sector_proj_graph<-function(data_sent,inventory_sent=inventory,project_sent
     geom_area(aes(year,emissions,fill=sector),color="black",position = "stack",linewidth=0.1,alpha=0.4)+
     scale_x_continuous(breaks=pretty_breaks(n=15))+
     #scale_fill_viridis("",discrete=TRUE,option="mako")+
-    scale_fill_viridis("",discrete=TRUE,option="cividis")+
+    scale_fill_manual("",values=plot_palette)+
     scale_colour_manual("",values="black",guide = "legend")+
     proj_graph()+
     proj_labs+
@@ -1435,7 +1438,7 @@ power_proj<-ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case) &
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=2020 & sector=="Electricity"),
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
   proj_labs+
@@ -1450,7 +1453,7 @@ ab_power_proj<-ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov =="AB" & year<=2020 & sector=="Electricity"),
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+
   theme(legend.position = "none")+
@@ -1466,7 +1469,7 @@ ggplot(proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Can
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=nir_year & sector=="Oil and Gas"),
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.1,alpha=.8)+
   scale_x_continuous(breaks=pretty_breaks())+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   proj_graph()+ proj_labs+
   labs(title="Canadian GHG Emissions from Oil and Gas")+
   NULL
@@ -1479,7 +1482,7 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2023") & prov !="Canad
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -1593,7 +1596,7 @@ inventory_provs<-
   scale_x_continuous(breaks=pretty_breaks())+
   scale_y_continuous(breaks=pretty_breaks(n=5))+
   
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.85,end=0.01)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -1691,8 +1694,7 @@ ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2023") & pr
   facet_wrap( ~ prov,nrow = 1)+
   scale_x_continuous(breaks=pretty_breaks())+
   scale_y_continuous(breaks=pretty_breaks(n=5))+
-  
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.85,end=0.01)+
@@ -1732,7 +1734,7 @@ inventory_sector<-ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2023
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -1781,7 +1783,7 @@ ggplot(filter(proj_data,year<=2015,emissions>0 & scenario%in% c("NIR 2023") & pr
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -1819,7 +1821,7 @@ ggplot(filter(proj_data,emissions>0 & scenario%in% c("NIR 2023") & prov !="Canad
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -1866,7 +1868,7 @@ proj_data %>% left_join(pop_data %>%
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -2041,17 +2043,19 @@ ab_proj<-proj_data %>% filter(prov=="AB")%>%
 ex_ab_proj<-proj_data %>% filter(prov!="AB",prov!="Canada")%>%
   group_by(scenario,year)%>%
   summarize(emissions=sum(emissions,na.rm=T))%>%
-  filter(emissions>0)
+  filter(emissions>0)%>%
+  filter(scenario %in% c("NIR 2023","2023 Reference Case","2023 Additional Measures Scenario"))
 
 
-globe_data<- cdn_data %>% mutate(prov="Canada"))%>%
+globe_data<- cdn_data %>% mutate(prov="Canada")%>%
   bind_rows(ab_proj %>% mutate(prov="Alberta"))%>%
   filter(scenario %in% c("NIR 2023","2023 Reference Case","2023 Additional Measures Scenario"))
   
+write_csv(cdn_data,file="data/globe_data.csv")
 
 #write_csv(globe_data,file="data/globe_data.csv")
 
-globe_data<-read_csv(file="data/globe_data.csv")
+#cdn_data<-read_csv(file="data/globe_data.csv")
 
 
 #ggplot(canadian_data)+geom_line(aes(year,emissions,group=scenario,color=scenario))
@@ -2088,8 +2092,8 @@ targets_graph<-
   annotate("text",x=2014.5,y=732.218*.83,label="Copenhagen Target\n(17% below 2005 levels by 2020)",
            colour=palette[9],fontface="bold",hjust=.5)+
   #paris
-  annotate("text",x=2029,y=732.218*.7,label="Paris Target (30% below 2005 levels by 2030)",
-           colour=palette[9],fontface="bold",hjust=1)+
+  annotate("text",x=2031,y=732.218*.7,label="Paris Target (30% below 2005 levels by 2030)",
+           colour=palette[9],fontface="bold",hjust=0)+
   #glasgow
   #geom_point(aes(2030,423),size=5,colour=palette[9])+ #glasgow target
   geom_errorbar(aes(x=2030,ymax=732.218*.6,ymin=732.218*.55),width=1.4,size=2,colour=palette[9])+
@@ -2114,10 +2118,36 @@ targets_graph+
 ggsave("images/emissions_and_targets_simple.png",bg="white",dpi=300,width=15,height=7)
 
 
+
+
+palette<-viridis(6,option="magma",direction = -1,begin = 0.2,end = .5)
+
 targets_graph+ 
-  labs(subtitle="Source: Environment and Climate Change Canada Emissions Inventory and Projections (2023).")+
-  annotate("text",x=2035.2,y=573,label="2023 ECCC Reference Case (2022-2035)",color="black",fontface="bold",hjust=0,vjust=1)
-ggsave("images/emissions_and_targets_ppt.png",bg="white",dpi=300,width=15,height=7)
+  labs(title="Canada's GHG Emissions, Projections and Future Targets",
+  subtitle="Source: Environment and Climate Change Canada National Emissions Inventory Report (2023) and Projections (2016-2023). Graph by Andrew Leach.")+
+  annotate("text",x=2035.2,y=573,label="2023 Reference Case",color="black",fontface="bold",hjust=0,vjust=0.5)+
+  geom_line(data=filter(cdn_data,scenario %in% c("2023 Additional Measures Scenario")),aes(year,emissions),color="darkgreen",lty="22",size=1.45)+
+  annotate("text",x=2035.2,y=467,label="2023 Additional Measures Scenario",color="darkgreen",fontface="bold",hjust=0,vjust=0.5)+
+  geom_line(data=filter(cdn_data,scenario %in% c("2023 Additional Measures Scenario (including LULUCF)")),aes(year,emissions),color="darkgreen",lty="21",size=1.45)+
+  annotate("text",x=2035.2,y=423,label="2023 Additional Measures Scenario (incl. LULUCF)",color="darkgreen",fontface="bold",hjust=0,vjust=0.5)+
+
+  geom_line(data=filter(cdn_data,scenario %in% c("2016 Reference Case")),aes(year,emissions),color=palette[1],lty="22",size=1.45)+
+  annotate("text",x=2030.2,y=815,label="2016 Reference Case",color=palette[1],fontface="bold",hjust=0,vjust=0.5)+
+  
+  geom_line(data=filter(cdn_data,scenario %in% c("2017 Reference Case")),aes(year,emissions),color=palette[2],lty="22",size=1.45)+
+  annotate("text",x=2030.2,y=722,label="2017 Reference Case",color=palette[2],fontface="bold",hjust=0,vjust=0.5)+
+  
+  
+  geom_line(data=filter(cdn_data,scenario %in% c("2018 Reference Case")),aes(year,emissions),color=palette[3],lty="22",size=1.45)+
+  annotate("text",x=2030.2,y=697,label="2018 Reference Case",color=palette[3],fontface="bold",hjust=0,vjust=0.5)+
+  geom_line(data=filter(cdn_data,scenario %in% c("2021 Reference Case")),aes(year,emissions),color=palette[4],lty="22",size=1.45)+
+  annotate("text",x=2030.2,y=658,label="2021 Reference Case",color=palette[4],fontface="bold",hjust=0,vjust=0.5)+
+
+    geom_line(data=filter(cdn_data,scenario %in% c("2022 Reference Case")),aes(year,emissions),color=palette[5],lty="22",size=1.45)+
+  annotate("text",x=2035.2,y=621,label="2022 Reference Case",color=palette[5],fontface="bold",hjust=0,vjust=0.5)+
+  
+  NULL
+ggsave("images/emissions_and_targets_both.png",bg="white",dpi=300,width=15,height=7)
 
 
 y_shift<-20
@@ -2220,26 +2250,32 @@ scale<-3
   #geom_point(data=filter(globe_data,year%%5==0,scenario %in% c("2023 Reference Case"),prov=="Alberta"),
   #           aes(year,emissions),color=alberta_blue,size=5)+
     
-    geom_text_repel(
-      direction = "x",
-      ylim = c(850,900),
-      nudge_y = 150,
-      segment.size=0.9,
-      #force_pull   =150, # do not pull toward data points
+    geom_curve(
       data=filter(globe_data,year%in%c(2025,2030,2035),scenario %in% c("2023 Reference Case"),prov=="Canada"),
-      #aes(x=year,y=emissions,label=str_wrap(paste("By ",year,", Canada will need to cut emissions ",round(emissions/(2050-year),0),"Mt/yr to 2050",sep=""),15)),color=canada_red)+
-      aes(x=year,y=emissions,label=str_wrap(paste("By ",year,", Canada will need to cut emissions roughly ",round((1-(50/emissions)^(1/(2050-year)))*100,1),"% per year to 2050",sep=""),15)),color=canada_red)+
+      aes(x = year+(year-2035)/2, y = 750, xend = year, yend = emissions+10),colour=canada_red,linewidth=1.2,
+      curvature = 0, arrow = arrow(length = unit(2, "mm"))
+    )+
+    
+    geom_text(
+      data=filter(globe_data,year%in%c(2025,2030,2035),scenario %in% c("2023 Reference Case"),prov=="Canada"),
+      aes(x= year+(year-2035)/2,y=760,
+      #    label=str_wrap(paste("By ",year,", Canada will need to cut emissions roughly ",round(emissions/(2050-year)),"Mt per year to 2050",sep=""),15)),
+      label=str_wrap(paste("By ",year,", Canada will need to cut emissions from ",round(emissions),"Mt/yr to net-zero in ",2050-year," years",sep=""),15)),
+      color=canada_red,vjust=0)+
   
     
-    geom_text_repel(
-      direction="x",
-      ylim = c(460,510),
-      nudge_x=-12,
-      nudge_y=30,
-      vjust=1,
-      segment.size=0.9,
+    geom_curve(
       data=filter(globe_data,year%in%c(2025,2030,2035),scenario %in% c("2023 Reference Case"),prov=="Alberta"),
-      aes(x=year,y=emissions,label=str_wrap(paste("By ",year,", Alberta will need to cut emissions roughly ",round((1-(20/emissions)^(1/(2050-year)))*100,1),"% per year to 2050",sep=""),15)),color=alberta_blue)+
+      aes(x =year-10-(2035-year)/2, y = 350, xend = year, yend = emissions+10),colour=alberta_blue,linewidth=1.2,
+      curvature = 0, arrow = arrow(length = unit(2, "mm"))
+    )+
+    
+    
+    geom_text(
+      data=filter(globe_data,year%in%c(2025,2030,2035),scenario %in% c("2023 Reference Case"),prov=="Alberta"),
+      aes(x=year-10-(2035-year)/2,y=360,
+    #label=str_wrap(paste("By ",year,", Alberta will need to cut emissions roughly ",round(emissions/(2050-year)),"Mt per year to 2050",sep=""),15)),color=alberta_blue,vjust=0)+
+    label=str_wrap(paste("By ",year,", Alberta will need to cut emissions from ",round(emissions),"Mt/yr to net-zero in ",2050-year," years",sep=""),15)),color=alberta_blue,vjust=0)+
     
     
     geom_curve(data=filter(globe_data,year%in%c(2025,2030,2035),scenario %in% c("2023 Reference Case"),prov=="Canada"),
@@ -2259,13 +2295,14 @@ scale<-3
     expand_limits(y=c(0,850),x=2050)+
     theme_fivethirtyeight()+
     theme(
-      panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank(), 
+      panel.grid.major.x = element_blank(),
       axis.text.x = element_text(margin = margin(c(.3,0,0,0),unit="cm")),
       plot.margin =  margin(c(2,1,1,1),unit="cm")
       )+
     
     scale_y_continuous(breaks=pretty_breaks(n=10),expand=c(0,0))+
-    scale_x_continuous(breaks=pretty_breaks(),expand=c(0,0))+
+    scale_x_continuous(breaks=pretty_breaks(n=10),expand=c(0,0))+
     coord_cartesian(clip = 'off')
     
   NULL
@@ -2471,7 +2508,7 @@ ggsave("made_up.png",width=13,height = 7,bg="white",dpi=100)
 
 nir_ipcc<-function() {
   #read_csv("http://donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_IPCC_Can_Prov_Terr.csv")
-  #download.file("http://donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_IPCC_Can_Prov_Terr.csv","data/canada_ghg_ipcc.csv",mode="wb")
+  download.file("https://data-donnees.az.ec.gc.ca/api/file?path=/substances%2Fmonitor%2Fcanada-s-official-greenhouse-gas-inventory%2FA-IPCC-Sector%2FEN_GHG_IPCC_Can_Prov_Terr.csv","data/canada_ghg_ipcc.csv",mode="wb")
   #temp_nir<-read.csv("canada_ghg_prelimi.csv",stringsAsFactors = F)
   nir_2021<-read.csv("data/canada_ghg_ipcc.csv",stringsAsFactors = F)%>% filter(Rollup==TRUE) %>% clean_names()%>%
     mutate(category=tolower(category))%>%select(year,region,sector=category,co2eq)
@@ -2541,7 +2578,7 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -2577,7 +2614,7 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+
@@ -2615,7 +2652,7 @@ ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector=="Aviation"))+
   scale_x_continuous(breaks=pretty_breaks())+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_viridis("",discrete=TRUE,option="B")+
+  scale_fill_manual("",values=plot_palette)+
   #scale_fill_manual("",values = my_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_colour_manual("",values="black",guide = "legend")+

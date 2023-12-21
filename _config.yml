@@ -14,7 +14,6 @@ navbar-links:
   National Emissions and Target: "canada"
   Provinces: "provinces"
   Economic Sectors: "econ_sectors"
-  IPCC Sectors: "ipcc_sectors"
   Projections: "projections"
   Alberta: "alberta"
   Github: "https://github.com/leachandrew/NIR"
