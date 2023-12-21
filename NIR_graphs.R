@@ -1263,7 +1263,8 @@ ggsave("images/inventory_proj_pc.png",dpi = 300,width=14, height=7,bg="white")
 
 #combined inventory and projections
 
-sector_plot<-  ggplot()+
+sector_plot<-  
+  ggplot()+
   geom_area(data=filter(proj_data,emissions>0 & scenario%in% c(inventory,project_case) & prov !="Canada" & year<=nir_year),
             aes(year,emissions,fill=prov),color="black",position = "stack",size=0.5,alpha=.8)+
   facet_wrap( ~ sector,nrow = 1)+
@@ -1272,7 +1273,7 @@ sector_plot<-  ggplot()+
   #scale_fill_manual("",values=colors_ua10())+
   scale_colour_manual("",values="black",guide = "legend")+
   proj_graph()+proj_plain+
-  theme(legend.position = c(.94,.85))+
+  theme(legend.position = c(.94,.75))+
   NULL
 
 ggsave(filename = "images/inventory_sector_plain.png",plot = sector_plot, dpi = 300,width=14, height=7,bg="white")
@@ -1311,7 +1312,7 @@ sector_proj<-
   NULL
 
 sector_proj+proj_labs+
-  scale_fill_viridis("",discrete=TRUE,option="cividis")
+  scale_fill_manual("",values=plot_palette)+
 labs(title="Canadian GHG Emissions by Sector")
 ggsave("images/sector_proj.png",dpi = 300,width=14, height=7,bg="white")
 
@@ -2503,180 +2504,180 @@ ggplot(oil_prod)+
 ggsave("made_up.png",width=13,height = 7,bg="white",dpi=100)
 
 
-#NIR but with IPCC Sectors
-
-
-nir_ipcc<-function() {
-  #read_csv("http://donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_IPCC_Can_Prov_Terr.csv")
-  download.file("https://data-donnees.az.ec.gc.ca/api/file?path=/substances%2Fmonitor%2Fcanada-s-official-greenhouse-gas-inventory%2FA-IPCC-Sector%2FEN_GHG_IPCC_Can_Prov_Terr.csv","data/canada_ghg_ipcc.csv",mode="wb")
-  #temp_nir<-read.csv("canada_ghg_prelimi.csv",stringsAsFactors = F)
-  nir_2021<-read.csv("data/canada_ghg_ipcc.csv",stringsAsFactors = F)%>% filter(Rollup==TRUE) %>% clean_names()%>%
-    mutate(category=tolower(category))%>%select(year,region,sector=category,co2eq)
-  
-  ipcc_nir<-nir_2021 %>% 
-    mutate(prov=as.factor(region),
-           prov=fct_recode(prov,"AB"="Alberta",
-                           "BC"="British Columbia",
-                           "NL"="Newfoundland and Labrador",
-                           "MB"="Manitoba",
-                           "SK"="Saskatchewan",
-                           "NS"="Nova Scotia",
-                           "ON"="Ontario",
-                           "NT"="Northwest Territories",
-                           "QC"="Quebec",
-                           "NU"="Nunavut",
-                           "NB"="New Brunswick",
-                           "YT"="Yukon",
-                           "PE"="Prince Edward Island",
-                           "NT & NU"="Northwest Territories and Nunavut"),
-           prov=fct_collapse(prov,
-                             "TERR" = c("NT", "NU","YT","NT & NU"),
-                             "ATL" = c("NL", "NB","NS","PE")),
-           NULL)%>% select(-region)%>%
-    #mutate(sector=factor(sector),
-    #       sector=fct_collapse(sector,"Inventory Total"=
-    #                            c("Territories Inventory Total","Territory Inventory Total","Provincial Inventory Total"))
-    #)%>%
-    group_by(year,prov,sector) %>% summarize(GHGs=sum(as.numeric(co2eq),na.rm = T)) %>% ungroup()%>%
-    mutate(year=as.numeric(year),prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
-  
-  
-  ipcc_nir
-}
-ipcc_nir<-nir_ipcc()
-
-save(ipcc_nir,file = "ipcc_nir.Rdata")
-
-
-ipcc_main_sectors<-c("Total","Stationary Combustion Sources","Transport","Fugitive Sources",
-                     "industrial processes and product use","agriculture","waste")
-
-
-
-
-#making air travel graph
-
-air_graph<-ipcc_nir %>% pivot_wider(names_from = "sector",values_from = GHGs,values_fill=0)%>%
-  mutate(other_transport=transport-aviation)%>% select(c(year,prov,tolower(ipcc_main_sectors),other_transport,aviation))%>%
-  select(-transport)%>%pivot_longer(-c(year,prov),names_to = "sector",values_to = "GHGs")%>%
-  mutate(sector=factor(str_to_title(gsub("_"," ",(sector)))),
-         sector=fct_reorder(sector,-GHGs),
-         sector=fct_relevel(sector,"Other Transport",after = 0),
-         sector=fct_relevel(sector,"Aviation",after = 0),
-         sector=fct_recode(sector,"Stationary Sources"="Stationary Combustion Sources",
-                           "Industrial P&P"="Industrial Processes And Product Use"
-         ),
-         NULL
-  )
-
-
-
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
-  geom_area(aes(year,GHGs/10^3,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  facet_wrap( ~ prov,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_manual("",values=plot_palette)+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_tufte()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    #panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 8, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by Province (IPCC Sectors)",
-       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
-       caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-ggsave("images/inventory_ipcc_prov.png",dpi = 300,width=14, height=7)
-
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
-  geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  facet_wrap( ~ sector,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_manual("",values=plot_palette)+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_tufte()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    #panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 8, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian GHG Emissions by IPCC Sectors",
-       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
-       caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-ggsave("images/inventory_ipcc_sector.png",dpi = 300,width=14, height=7)
-
-
-
-ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector=="Aviation"))+
-  geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
-  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
-  #facet_wrap( ~ sector,nrow = 1)+
-  scale_x_continuous(breaks=pretty_breaks())+
-  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
-  #scale_fill_viridis("",discrete=TRUE,option="E")+
-  scale_fill_manual("",values=plot_palette)+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
-  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
-  scale_colour_manual("",values="black",guide = "legend")+
-  geom_hline(aes(yintercept=0))+
-  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
-  theme_tufte()+theme(
-    legend.position = "right",
-    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
-    legend.text = element_text(colour="black", size = 12),
-    plot.caption = element_text(size = 10, face = "italic",hjust=0),
-    plot.title = element_text(size=16,face = "bold"),
-    plot.subtitle = element_text(size = 10),
-    #panel.grid.minor = element_blank(),
-    text = element_text(size = 20,face = "bold"),
-    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
-    #axis.text.x = element_blank(),
-    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
-    strip.text.x = element_text(size = 8, colour = "black", angle = 0),
-    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
-  )+
-  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
-       title="Canadian Aviation Emissions (IPCC Definition)",
-       #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
-       caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
-       NULL
-  )
-ggsave("images/inventory_aviation_sector.png",dpi = 300,width=14, height=7)
+# #NIR but with IPCC Sectors
+# 
+# 
+# nir_ipcc<-function() {
+#   #read_csv("http://donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/GHG_IPCC_Can_Prov_Terr.csv")
+#   download.file("https://data-donnees.az.ec.gc.ca/api/file?path=/substances%2Fmonitor%2Fcanada-s-official-greenhouse-gas-inventory%2FA-IPCC-Sector%2FEN_GHG_IPCC_Can_Prov_Terr.csv","data/canada_ghg_ipcc.csv",mode="wb")
+#   #temp_nir<-read.csv("canada_ghg_prelimi.csv",stringsAsFactors = F)
+#   nir_2021<-read.csv("data/canada_ghg_ipcc.csv",stringsAsFactors = F)%>% filter(Rollup==TRUE) %>% clean_names()%>%
+#     mutate(category=tolower(category))%>%select(year,region,sector=category,co2eq)
+#   
+#   ipcc_nir<-nir_2021 %>% 
+#     mutate(prov=as.factor(region),
+#            prov=fct_recode(prov,"AB"="Alberta",
+#                            "BC"="British Columbia",
+#                            "NL"="Newfoundland and Labrador",
+#                            "MB"="Manitoba",
+#                            "SK"="Saskatchewan",
+#                            "NS"="Nova Scotia",
+#                            "ON"="Ontario",
+#                            "NT"="Northwest Territories",
+#                            "QC"="Quebec",
+#                            "NU"="Nunavut",
+#                            "NB"="New Brunswick",
+#                            "YT"="Yukon",
+#                            "PE"="Prince Edward Island",
+#                            "NT & NU"="Northwest Territories and Nunavut"),
+#            prov=fct_collapse(prov,
+#                              "TERR" = c("NT", "NU","YT","NT & NU"),
+#                              "ATL" = c("NL", "NB","NS","PE")),
+#            NULL)%>% select(-region)%>%
+#     #mutate(sector=factor(sector),
+#     #       sector=fct_collapse(sector,"Inventory Total"=
+#     #                            c("Territories Inventory Total","Territory Inventory Total","Provincial Inventory Total"))
+#     #)%>%
+#     group_by(year,prov,sector) %>% summarize(GHGs=sum(as.numeric(co2eq),na.rm = T)) %>% ungroup()%>%
+#     mutate(year=as.numeric(year),prov=factor(prov, levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )))
+#   
+#   
+#   ipcc_nir
+# }
+# ipcc_nir<-nir_ipcc()
+# 
+# save(ipcc_nir,file = "ipcc_nir.Rdata")
+# 
+# 
+# ipcc_main_sectors<-c("Total","Stationary Combustion Sources","Transport","Fugitive Sources",
+#                      "industrial processes and product use","agriculture","waste")
+# 
+# 
+# 
+# 
+# #making air travel graph
+# 
+# air_graph<-ipcc_nir %>% pivot_wider(names_from = "sector",values_from = GHGs,values_fill=0)%>%
+#   mutate(other_transport=transport-aviation)%>% select(c(year,prov,tolower(ipcc_main_sectors),other_transport,aviation))%>%
+#   select(-transport)%>%pivot_longer(-c(year,prov),names_to = "sector",values_to = "GHGs")%>%
+#   mutate(sector=factor(str_to_title(gsub("_"," ",(sector)))),
+#          sector=fct_reorder(sector,-GHGs),
+#          sector=fct_relevel(sector,"Other Transport",after = 0),
+#          sector=fct_relevel(sector,"Aviation",after = 0),
+#          sector=fct_recode(sector,"Stationary Sources"="Stationary Combustion Sources",
+#                            "Industrial P&P"="Industrial Processes And Product Use"
+#          ),
+#          NULL
+#   )
+# 
+# 
+# 
+# ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
+#   geom_area(aes(year,GHGs/10^3,fill=sector),color="black",position = "stack",size=0.1,alpha=.6)+
+#   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+#   facet_wrap( ~ prov,nrow = 1)+
+#   scale_x_continuous(breaks=pretty_breaks())+
+#   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+#   #scale_fill_viridis("",discrete=TRUE,option="E")+
+#   scale_fill_manual("",values=plot_palette)+
+#   #scale_fill_manual("",values = my_palette,guide = "legend")+
+#   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+#   scale_colour_manual("",values="black",guide = "legend")+
+#   geom_hline(aes(yintercept=0))+
+#   #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+#   theme_tufte()+theme(
+#     legend.position = "right",
+#     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+#     legend.text = element_text(colour="black", size = 12),
+#     plot.caption = element_text(size = 10, face = "italic",hjust=0),
+#     plot.title = element_text(size=16,face = "bold"),
+#     plot.subtitle = element_text(size = 10),
+#     #panel.grid.minor = element_blank(),
+#     text = element_text(size = 20,face = "bold"),
+#     axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+#     #axis.text.x = element_blank(),
+#     axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+#     strip.text.x = element_text(size = 8, colour = "black", angle = 0),
+#     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+#   )+
+#   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+#        title="Canadian GHG Emissions by Province (IPCC Sectors)",
+#        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+#        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
+#        NULL
+#   )
+# ggsave("images/inventory_ipcc_prov.png",dpi = 300,width=14, height=7)
+# 
+# ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector!="Total"))+
+#   geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
+#   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+#   facet_wrap( ~ sector,nrow = 1)+
+#   scale_x_continuous(breaks=pretty_breaks())+
+#   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+#   #scale_fill_viridis("",discrete=TRUE,option="E")+
+#   scale_fill_manual("",values=plot_palette)+
+#   #scale_fill_manual("",values = my_palette,guide = "legend")+
+#   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+#   scale_colour_manual("",values="black",guide = "legend")+
+#   geom_hline(aes(yintercept=0))+
+#   #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+#   theme_tufte()+theme(
+#     legend.position = "right",
+#     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+#     legend.text = element_text(colour="black", size = 12),
+#     plot.caption = element_text(size = 10, face = "italic",hjust=0),
+#     plot.title = element_text(size=16,face = "bold"),
+#     plot.subtitle = element_text(size = 10),
+#     #panel.grid.minor = element_blank(),
+#     text = element_text(size = 20,face = "bold"),
+#     axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+#     #axis.text.x = element_blank(),
+#     axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+#     strip.text.x = element_text(size = 8, colour = "black", angle = 0),
+#     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+#   )+
+#   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+#        title="Canadian GHG Emissions by IPCC Sectors",
+#        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+#        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
+#        NULL
+#   )
+# ggsave("images/inventory_ipcc_sector.png",dpi = 300,width=14, height=7)
+# 
+# 
+# 
+# ggplot(filter(air_graph,GHGs>0 & prov !="Canada",sector=="Aviation"))+
+#   geom_area(aes(year,GHGs/10^3,fill=prov),color="black",position = "stack",size=0.1,alpha=.6)+
+#   #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+#   #facet_wrap( ~ sector,nrow = 1)+
+#   scale_x_continuous(breaks=pretty_breaks())+
+#   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+#   #scale_fill_viridis("",discrete=TRUE,option="E")+
+#   scale_fill_manual("",values=plot_palette)+
+#   #scale_fill_manual("",values = my_palette,guide = "legend")+
+#   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+#   scale_colour_manual("",values="black",guide = "legend")+
+#   geom_hline(aes(yintercept=0))+
+#   #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+#   theme_tufte()+theme(
+#     legend.position = "right",
+#     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+#     legend.text = element_text(colour="black", size = 12),
+#     plot.caption = element_text(size = 10, face = "italic",hjust=0),
+#     plot.title = element_text(size=16,face = "bold"),
+#     plot.subtitle = element_text(size = 10),
+#     #panel.grid.minor = element_blank(),
+#     text = element_text(size = 20,face = "bold"),
+#     axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+#     #axis.text.x = element_blank(),
+#     axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+#     strip.text.x = element_text(size = 8, colour = "black", angle = 0),
+#     axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+#   )+
+#   labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'),
+#        title="Canadian Aviation Emissions (IPCC Definition)",
+#        #subtitle=paste("2020 National Inventory (1990-2018)",sep=""),
+#        caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory (1990-2020). Graph by @andrew_leach.",width = 180),
+#        NULL
+#   )
+# ggsave("images/inventory_aviation_sector.png",dpi = 300,width=14, height=7)
