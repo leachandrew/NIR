@@ -535,7 +535,9 @@ ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
 ggsave("images/natl_per_cap.png",height = 9,width = 16,bg="white",dpi=300)
 
 
+library(wesanderson)
 
+plot_palette<-wes_palette("BottleRocket2", 8, type = "continuous")
 
 oil_sectors<-c("Conventional Heavy Oil Production","Conventional Light Oil Production","Frontier Oil Production",
                "Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
@@ -547,7 +549,8 @@ nir_oil<-ggplot(new_nir %>% filter(Prov=="Canada",sector%in%oil_sectors)%>%
                          sector=fct_relevel(sector,"Conventional Light Oil Production")))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  #scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  scale_fill_manual("",values=plot_palette)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
   scale_x_continuous(breaks=pretty_breaks(n=15), expand = c(0,0))+
@@ -577,7 +580,7 @@ nir_oil_prov<-ggplot(new_nir %>% filter(Prov!="Canada",sector%in%c(oil_sectors,"
                                               ))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  scale_fill_manual("",values=plot_palette)+
   facet_grid( ~ Prov)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
@@ -646,7 +649,7 @@ nir_oil_gas<-ggplot(new_nir %>% filter(Prov=="Canada",sector%in%oil_gas_sectors)
                   )+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="D",direction = -1)+
+  scale_fill_manual("",values=plot_palette)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
   scale_x_continuous(breaks=pretty_breaks(n=15), expand = c(0,0))+
@@ -676,7 +679,7 @@ nir_oil_prov<-ggplot(new_nir %>% filter(Prov!="Canada",sector%in%c(oil_sectors,"
                        ))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  scale_fill_manual("",values=plot_palette)+
   facet_grid( ~ Prov)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
@@ -712,7 +715,7 @@ nir_oil_ab<-ggplot(new_nir %>% filter(Prov=="AB",sector%in%oil_sectors)%>%
                             sector=fct_relevel(sector,"Conventional Light Oil Production")))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="B",direction = -1)+
+  scale_fill_manual("",values=plot_palette)+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="D")+
   #scale_fill_viridis("",discrete=TRUE,option="D")+
   scale_x_continuous(breaks=pretty_breaks(n=15), expand = c(0,0))+
@@ -1366,6 +1369,7 @@ sector_proj_col<-function(data_sent,inventory_sent=inventory,project_sent=projec
     labs(title=paste("Canadian GHG Emissions from ",sector_sent,sep=""))
   ggsave(file_sent,dpi = 300,width=14, height=7,bg="white")
 }
+
 sector_proj_col(proj_data,sector_sent = "Electricity",file_sent = "images/power_proj_col.png")
 
 sector_proj_graph(proj_data,sector_sent = "Oil and Gas",file_sent = "images/oil_proj.png")
