@@ -15,6 +15,8 @@ library(cansim)
 library(tidyverse)
 library(cowplot)
 library(ggrepel)
+library(wesanderson)
+library(ggsci)
 
 
 #NIR data
@@ -433,6 +435,18 @@ plot_grid(top,bottom,nrow = 2)
 ggsave("images/index_provs.png",width=16,height=16,bg="white",dpi=300)
 
 
+plot_palette<-wes_palette("BottleRocket2", 8, type = "continuous")
+plot_palette<-pal_jco()(8)
+plot_palette<-pal_simpsons()(9)
+
+
+#ypal <- pal_npg("nrc", alpha = 0.7)(9)
+#mypal
+#> [1] "#E64B35B2" "#4DBBD5B2" "#00A087B2" "#3C5488B2" "#F39B7FB2" "#8491B4B2"
+#> [7] "#91D1C2B2" "#DC0000B2" "#7E6148B2"
+
+#library("scales")
+show_col(plot_palette)
 
 
 ggplot(totals)+
@@ -440,7 +454,7 @@ ggplot(totals)+
   facet_wrap( ~ index,nrow = 1,scales="free_y")+
   #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
   #scale_fill_viridis("",discrete=TRUE,option="E")+
-  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  scale_fill_manual("",values = plot_palette,guide = "legend")+
   #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
   scale_x_continuous(breaks=pretty_breaks())+
   scale_colour_manual("",values=c("black",colors_tableau10()),guide = "legend")+
@@ -475,10 +489,12 @@ ggsave("images/GHG_per_GDP.png",width=16,height=9,bg="white",dpi=400)
 ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),color="black",size=0.5)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="turbo",direction = -1)+
+  #scale_fill_viridis("",discrete=TRUE,option="turbo",direction = -1)+
+  scale_fill_manual("",values = plot_palette,guide = "legend")+
+  
   scale_colour_manual("",values="black",guide = "legend")+
   scale_x_continuous(breaks=pretty_breaks(n=16), expand = c(0,0))+
-  guides(fill=guide_legend(nrow =2,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
   theme_minimal()+theme(
     legend.position = "bottom",
     legend.margin=margin(c(.05,0,.05,0),unit="cm"),
@@ -503,7 +519,8 @@ ggsave("images/nir_natl.png",width=16,height=9,bg="white",dpi=300)
 ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
   geom_area(aes(Year,per_cap*10^6,group=sector,fill=sector),color="black",size=0.5)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
-  scale_fill_viridis("",discrete=TRUE,option="cividis",direction = -1)+
+  #scale_fill_viridis("",discrete=TRUE,option="cividis",direction = -1)+
+  scale_fill_manual("",values = plot_palette,guide = "legend")+
   #annotate("rect", fill = "black", 
   #         xmin = 2008+3/12, xmax =2008+4/12,
   #         ymin = -Inf, ymax = 23) +
@@ -535,14 +552,13 @@ ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
 ggsave("images/natl_per_cap.png",height = 9,width = 16,bg="white",dpi=300)
 
 
-library(wesanderson)
 
-plot_palette<-wes_palette("BottleRocket2", 8, type = "continuous")
+
 
 oil_sectors<-c("Conventional Heavy Oil Production","Conventional Light Oil Production","Frontier Oil Production",
-               "Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
+               "Oil Sands Mining","Oil Sands In Situ","In-Situ","Oil Sands Upgrading")
 
-oil_sands_sectors<-c("Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading")
+oil_sands_sectors<-c("Oil Sands Mining","Oil Sands In Situ","Oil Sands Upgrading","In-Situ")
 
 nir_oil<-ggplot(new_nir %>% filter(Prov=="Canada",sector%in%oil_sectors)%>%
                   mutate(sector=as_factor(sector),
@@ -710,9 +726,12 @@ ggsave("images/nir_oil_prov.png",width=16,height=9,bg="white",dpi=300)
 
 
 
-nir_oil_ab<-ggplot(new_nir %>% filter(Prov=="AB",sector%in%oil_sectors)%>%
+nir_oil_ab<-
+  ggplot(new_nir %>% filter(Prov=="AB",sector%in%oil_sectors)%>%
                      mutate(sector=as_factor(sector),
-                            sector=fct_relevel(sector,"Conventional Light Oil Production")))+
+                            sector=fct_relevel(sector,"Conventional Light Oil Production"),
+                            sector=fct_recode(sector,"Oil Sands In-Situ"="In-Situ")
+                            ))+
   geom_area(aes(Year,GHGs,group=sector,fill=sector),position="stack",color="black",size=0.25)+
   #scale_fill_manual("",values = c(colors_tableau10(),colors_tableau10_medium()),guide = "legend")+
   scale_fill_manual("",values=plot_palette)+
@@ -729,7 +748,7 @@ ggsave("images/nir_oil_ab_raw.png",width=16,height=9,bg="white",dpi=300)
 nir_oil_ab+labs(title="GHG Emissions from Crude Oil and Oil Sands Production in Alberta, 1990-2021",
                 #subtitle="According to Ian Brodie, they first declined after March, 2008.",
                 caption="Source: Environment Canada National Inventory Data, graph by @andrew_leach")
-ggsave("images/nir_AB_oil_gas.png",width=12,height=5,bg="white",dpi=300)
+ggsave("images/nir_AB_oil_gas.png",width=14,height=8,bg="white",dpi=300)
 
 
 
