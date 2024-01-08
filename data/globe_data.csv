@@ -1,23 +1,10 @@
 scenario,year,emissions
-2018 Additional Measures Scenario,2017,706.5
-2018 Additional Measures Scenario,2019,709.7
-2018 Additional Measures Scenario,2020,700.7
-2018 Additional Measures Scenario,2021,678.9
-2018 Additional Measures Scenario,2022,657.3
-2018 Additional Measures Scenario,2023,650.6
-2018 Additional Measures Scenario,2024,646.5
-2018 Additional Measures Scenario,2025,646.5
-2018 Additional Measures Scenario,2026,645.6
-2018 Additional Measures Scenario,2027,644.3
-2018 Additional Measures Scenario,2028,639.3
-2018 Additional Measures Scenario,2029,634.5
-2018 Additional Measures Scenario,2030,625.2
 2018 Reference Case,2017,706.8
 2018 Reference Case,2019,720.3
 2018 Reference Case,2020,715.2
 2018 Reference Case,2021,712
 2018 Reference Case,2022,707
-2018 Reference Case,2023,700.1999999999999
+2018 Reference Case,2023,700.2
 2018 Reference Case,2024,702.1
 2018 Reference Case,2025,708
 2018 Reference Case,2026,709.8
@@ -25,20 +12,8 @@ scenario,year,emissions
 2018 Reference Case,2028,708.6
 2018 Reference Case,2029,709.6
 2018 Reference Case,2030,696.7
-2019 Additional Measures Scenario,2019,716.6
-2019 Additional Measures Scenario,2020,697.3
-2019 Additional Measures Scenario,2021,686
-2019 Additional Measures Scenario,2022,669.7
-2019 Additional Measures Scenario,2023,655.6
-2019 Additional Measures Scenario,2024,647.2
-2019 Additional Measures Scenario,2025,645
-2019 Additional Measures Scenario,2026,641.6
-2019 Additional Measures Scenario,2027,634.8
-2019 Additional Measures Scenario,2028,628.6
-2019 Additional Measures Scenario,2029,619.9
-2019 Additional Measures Scenario,2030,612.2
 2019 Reference Case,2019,716.6
-2019 Reference Case,2020,701.6999999999999
+2019 Reference Case,2020,701.7
 2019 Reference Case,2021,690.9
 2019 Reference Case,2022,680.9
 2019 Reference Case,2023,669.5
@@ -60,38 +35,23 @@ scenario,year,emissions
 2020 Reference Case,2027,676.2
 2020 Reference Case,2028,675.8
 2020 Reference Case,2029,675.7
-2020 Reference Case,2030,673.3000000000001
+2020 Reference Case,2030,673.3
 2021 Reference Case,2020,673.3
 2021 Reference Case,2021,679.8
 2021 Reference Case,2022,685.1
 2021 Reference Case,2023,679.7
 2021 Reference Case,2024,681.3
-2021 Reference Case,2025,678.1999999999999
+2021 Reference Case,2025,678.2
 2021 Reference Case,2026,678.9
 2021 Reference Case,2027,675.4
 2021 Reference Case,2028,668.5
 2021 Reference Case,2029,665.9
 2021 Reference Case,2030,658.3
-2022 Additional Measures Scenario,2021,698.7
-2022 Additional Measures Scenario,2022,702.5
-2022 Additional Measures Scenario,2023,685.9
-2022 Additional Measures Scenario,2024,670
-2022 Additional Measures Scenario,2025,649
-2022 Additional Measures Scenario,2026,625
-2022 Additional Measures Scenario,2027,596
-2022 Additional Measures Scenario,2028,567.1
-2022 Additional Measures Scenario,2029,543.4
-2022 Additional Measures Scenario,2030,520.7
-2022 Additional Measures Scenario,2031,505.6
-2022 Additional Measures Scenario,2032,496.7
-2022 Additional Measures Scenario,2033,488.9
-2022 Additional Measures Scenario,2034,482.7
-2022 Additional Measures Scenario,2035,469.4
-2022 Reference Case,2021,698.6999999999999
+2022 Reference Case,2021,698.7
 2022 Reference Case,2022,704.7
 2022 Reference Case,2023,698.5
 2022 Reference Case,2024,689.6
-2022 Reference Case,2025,684.6999999999999
+2022 Reference Case,2025,684.7
 2022 Reference Case,2026,678.4
 2022 Reference Case,2027,666.9
 2022 Reference Case,2028,653.7
@@ -130,38 +90,38 @@ scenario,year,emissions
 2023 Reference Case,2033,579
 2023 Reference Case,2034,575.9
 2023 Reference Case,2035,572.6
-NIR 2023,1990,590.384004183305
-NIR 2023,1991,583.78497780613
-NIR 2023,1992,600.812131625997
-NIR 2023,1993,603.615351353835
-NIR 2023,1994,623.973266961655
-NIR 2023,1995,641.170291270557
-NIR 2023,1996,662.881423311935
-NIR 2023,1997,678.324655810963
-NIR 2023,1998,684.186609988793
-NIR 2023,1999,694.516942185781
-NIR 2023,2000,719.463711175963
-NIR 2023,2001,710.171835824224
-NIR 2023,2002,715.489771059508
-NIR 2023,2003,734.140546577692
-NIR 2023,2004,736.725467881279
-NIR 2023,2005,731.991409810112
-NIR 2023,2006,725.091839238946
-NIR 2023,2007,747.848119039452
-NIR 2023,2008,730.568041257373
-NIR 2023,2009,689.352724504786
-NIR 2023,2010,701.672020764329
-NIR 2023,2011,711.123921597328
-NIR 2023,2012,716.215591287769
-NIR 2023,2013,722.953293409564
-NIR 2023,2014,719.984615314274
-NIR 2023,2015,722.6745629808311
-NIR 2023,2016,704.68795466323
-NIR 2023,2017,711.999840499686
-NIR 2023,2018,724.362042147201
-NIR 2023,2019,723.435573805591
-NIR 2023,2020,658.550497717653
-NIR 2023,2021,670.187756049698
+NIR 2023,1990,590.3840042
+NIR 2023,1991,583.7849778
+NIR 2023,1992,600.8121316
+NIR 2023,1993,603.6153514
+NIR 2023,1994,623.973267
+NIR 2023,1995,641.1702913
+NIR 2023,1996,662.8814233
+NIR 2023,1997,678.3246558
+NIR 2023,1998,684.18661
+NIR 2023,1999,694.5169422
+NIR 2023,2000,719.4637112
+NIR 2023,2001,710.1718358
+NIR 2023,2002,715.4897711
+NIR 2023,2003,734.1405466
+NIR 2023,2004,736.7254679
+NIR 2023,2005,731.9914098
+NIR 2023,2006,725.0918392
+NIR 2023,2007,747.848119
+NIR 2023,2008,730.5680413
+NIR 2023,2009,689.3527245
+NIR 2023,2010,701.6720208
+NIR 2023,2011,711.1239216
+NIR 2023,2012,716.2155913
+NIR 2023,2013,722.9532934
+NIR 2023,2014,719.9846153
+NIR 2023,2015,722.674563
+NIR 2023,2016,704.6879547
+NIR 2023,2017,711.9998405
+NIR 2023,2018,724.3620421
+NIR 2023,2019,723.4355738
+NIR 2023,2020,658.5504977
+NIR 2023,2021,670.187756
 2016 Reference Case,2015,735
 2016 Reference Case,2016,747
 2017 Reference Case,2016,722
@@ -193,90 +153,6 @@ NIR 2023,2021,670.187756049698
 2017 Reference Case,2029,722
 2016 Reference Case,2030,815
 2017 Reference Case,2030,722
-Fast GDP and Population Growth,2022,684
-Fast GDP and Population Growth,2023,682
-Fast GDP and Population Growth,2024,666
-Fast GDP and Population Growth,2025,661
-Fast GDP and Population Growth,2026,654
-Fast GDP and Population Growth,2027,650
-Fast GDP and Population Growth,2028,636
-Fast GDP and Population Growth,2029,628
-Fast GDP and Population Growth,2030,615
-Fast GDP and Population Growth,2031,610
-Fast GDP and Population Growth,2032,608
-Fast GDP and Population Growth,2033,608
-Fast GDP and Population Growth,2034,607
-Fast GDP and Population Growth,2035,607
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2022,684
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2023,680
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2024,664
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2025,660
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2026,655
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2027,650
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2028,637
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2029,629
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2030,618
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2031,616
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2032,616
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2033,617
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2034,619
-"Fast GDP and Population Growth, and High Oil and Gas Prices",2035,621
-High Oil and Gas Prices,2022,684
-High Oil and Gas Prices,2023,670
-High Oil and Gas Prices,2024,653
-High Oil and Gas Prices,2025,648
-High Oil and Gas Prices,2026,642
-High Oil and Gas Prices,2027,635
-High Oil and Gas Prices,2028,618
-High Oil and Gas Prices,2029,606
-High Oil and Gas Prices,2030,592
-High Oil and Gas Prices,2031,589
-High Oil and Gas Prices,2032,586
-High Oil and Gas Prices,2033,585
-High Oil and Gas Prices,2034,586
-High Oil and Gas Prices,2035,586
-Low Oil and Gas Prices,2022,684
-Low Oil and Gas Prices,2023,677
-Low Oil and Gas Prices,2024,661
-Low Oil and Gas Prices,2025,658
-Low Oil and Gas Prices,2026,649
-Low Oil and Gas Prices,2027,643
-Low Oil and Gas Prices,2028,625
-Low Oil and Gas Prices,2029,611
-Low Oil and Gas Prices,2030,593
-Low Oil and Gas Prices,2031,585
-Low Oil and Gas Prices,2032,578
-Low Oil and Gas Prices,2033,573
-Low Oil and Gas Prices,2034,567
-Low Oil and Gas Prices,2035,563
-Slow GDP and Population Growth,2022,684
-Slow GDP and Population Growth,2023,673
-Slow GDP and Population Growth,2024,653
-Slow GDP and Population Growth,2025,643
-Slow GDP and Population Growth,2026,630
-Slow GDP and Population Growth,2027,618
-Slow GDP and Population Growth,2028,597
-Slow GDP and Population Growth,2029,581
-Slow GDP and Population Growth,2030,564
-Slow GDP and Population Growth,2031,556
-Slow GDP and Population Growth,2032,549
-Slow GDP and Population Growth,2033,545
-Slow GDP and Population Growth,2034,541
-Slow GDP and Population Growth,2035,536
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2022,684
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2023,675
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2024,655
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2025,647
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2026,635
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2027,623
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2028,602
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2029,584
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2030,563
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2031,553
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2032,544
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2033,538
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2034,530
-"Slow GDP and Population Growth, and Low Oil and Gas Prices",2035,523
 2023 Additional Measures Scenario (excluding LULUCF),2022,674.5
 2023 Additional Measures Scenario (excluding LULUCF),2023,663.7
 2023 Additional Measures Scenario (excluding LULUCF),2024,637.4
@@ -333,96 +209,3 @@ Slow GDP and Population Growth,2035,536
 2023 Reference Case (including LULUCF),2033,547.7
 2023 Reference Case (including LULUCF),2034,543.7
 2023 Reference Case (including LULUCF),2035,541.4
-Backcasting Scenario (including LULUCF),2022,687.7
-Backcasting Scenario (including LULUCF),2023,625.5
-Backcasting Scenario (including LULUCF),2024,605.9
-Backcasting Scenario (including LULUCF),2025,586
-Backcasting Scenario (including LULUCF),2026,559
-Backcasting Scenario (including LULUCF),2027,533.4
-Backcasting Scenario (including LULUCF),2028,506.3
-Backcasting Scenario (including LULUCF),2029,473.2
-Backcasting Scenario (including LULUCF),2030,438.4
-Fast GDP and Population Growth (excluding LULUCF),2022,684
-Fast GDP and Population Growth (excluding LULUCF),2023,682
-Fast GDP and Population Growth (excluding LULUCF),2024,666
-Fast GDP and Population Growth (excluding LULUCF),2025,661
-Fast GDP and Population Growth (excluding LULUCF),2026,654
-Fast GDP and Population Growth (excluding LULUCF),2027,650
-Fast GDP and Population Growth (excluding LULUCF),2028,636
-Fast GDP and Population Growth (excluding LULUCF),2029,628
-Fast GDP and Population Growth (excluding LULUCF),2030,615
-Fast GDP and Population Growth (excluding LULUCF),2031,610
-Fast GDP and Population Growth (excluding LULUCF),2032,608
-Fast GDP and Population Growth (excluding LULUCF),2033,608
-Fast GDP and Population Growth (excluding LULUCF),2034,607
-Fast GDP and Population Growth (excluding LULUCF),2035,607
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2022,684
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2023,680
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2024,664
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2025,660
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2026,655
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2027,650
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2028,637
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2029,629
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2030,618
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2031,616
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2032,616
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2033,617
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2034,619
-"Fast GDP and Population Growth, and High Oil and Gas Prices (excluding LULUCF)",2035,621
-High Oil and Gas Prices (excluding LULUCF),2022,684
-High Oil and Gas Prices (excluding LULUCF),2023,670
-High Oil and Gas Prices (excluding LULUCF),2024,653
-High Oil and Gas Prices (excluding LULUCF),2025,648
-High Oil and Gas Prices (excluding LULUCF),2026,642
-High Oil and Gas Prices (excluding LULUCF),2027,635
-High Oil and Gas Prices (excluding LULUCF),2028,618
-High Oil and Gas Prices (excluding LULUCF),2029,606
-High Oil and Gas Prices (excluding LULUCF),2030,592
-High Oil and Gas Prices (excluding LULUCF),2031,589
-High Oil and Gas Prices (excluding LULUCF),2032,586
-High Oil and Gas Prices (excluding LULUCF),2033,585
-High Oil and Gas Prices (excluding LULUCF),2034,586
-High Oil and Gas Prices (excluding LULUCF),2035,586
-Low Oil and Gas Prices (excluding LULUCF),2022,684
-Low Oil and Gas Prices (excluding LULUCF),2023,677
-Low Oil and Gas Prices (excluding LULUCF),2024,661
-Low Oil and Gas Prices (excluding LULUCF),2025,658
-Low Oil and Gas Prices (excluding LULUCF),2026,649
-Low Oil and Gas Prices (excluding LULUCF),2027,643
-Low Oil and Gas Prices (excluding LULUCF),2028,625
-Low Oil and Gas Prices (excluding LULUCF),2029,611
-Low Oil and Gas Prices (excluding LULUCF),2030,593
-Low Oil and Gas Prices (excluding LULUCF),2031,585
-Low Oil and Gas Prices (excluding LULUCF),2032,578
-Low Oil and Gas Prices (excluding LULUCF),2033,573
-Low Oil and Gas Prices (excluding LULUCF),2034,567
-Low Oil and Gas Prices (excluding LULUCF),2035,563
-Slow GDP and Population Growth (excluding LULUCF),2022,684
-Slow GDP and Population Growth (excluding LULUCF),2023,673
-Slow GDP and Population Growth (excluding LULUCF),2024,653
-Slow GDP and Population Growth (excluding LULUCF),2025,643
-Slow GDP and Population Growth (excluding LULUCF),2026,630
-Slow GDP and Population Growth (excluding LULUCF),2027,618
-Slow GDP and Population Growth (excluding LULUCF),2028,597
-Slow GDP and Population Growth (excluding LULUCF),2029,581
-Slow GDP and Population Growth (excluding LULUCF),2030,564
-Slow GDP and Population Growth (excluding LULUCF),2031,556
-Slow GDP and Population Growth (excluding LULUCF),2032,549
-Slow GDP and Population Growth (excluding LULUCF),2033,545
-Slow GDP and Population Growth (excluding LULUCF),2034,541
-Slow GDP and Population Growth (excluding LULUCF),2035,536
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2022,684
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2023,675
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2024,655
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2025,647
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2026,635
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2027,623
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2028,602
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2029,584
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2030,563
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2031,553
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2032,544
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2033,538
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2034,530
-"Slow GDP and Population Growth, and Low Oil and Gas Prices (excluding LULUCF)",2035,523

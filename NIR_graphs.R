@@ -236,9 +236,10 @@ attn_sectors<-c(
 )
 
 
-prov_ghgs <- NIR_data%>% filter(sector %in% main_sectors)%>%group_by(Prov,Year)%>% summarize(GHGs=sum(GHGs,na.rm = T))
-save(prov_ghgs,file = "data/prov_ghgs.Rdata")
-                                                                         
+#prov_ghgs <- NIR_data%>% filter(sector %in% main_sectors)%>%group_by(Prov,Year)%>% summarize(GHGs=sum(GHGs,na.rm = T))
+#save(prov_ghgs,file = "data/prov_ghgs.Rdata")
+load(file = "data/prov_ghgs.Rdata")
+
 
 NIR_natl<-filter(new_nir,Prov=="Canada")
 NIR_natl$Year<-as.numeric(NIR_natl$Year)
@@ -1088,7 +1089,7 @@ proj_data<-proj_data %>%#filter(prov!="TERR")%>%
 proj_data
 }
 
-proj_data<-build_proj_data()
+#proj_data<-build_proj_data()
 #save(proj_data,file = "data/proj_data.Rdata")
 load(file = "data/proj_data.Rdata")
 
