@@ -36,9 +36,13 @@ get_new_nir<-function() {
   #nir_2022<-read.csv("canada_ghg_2022_dl.csv",stringsAsFactors = F)
   
   
-  download.file("https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/B-Economic-Sector/EN_GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2023_dl.csv",mode="wb")
-  nir_2023<-read.csv("canada_ghg_2023_dl.csv",stringsAsFactors = F)
+  #download.file("https://data-donnees.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/B-Economic-Sector/EN_GHG_Econ_Can_Prov_Terr.csv","canada_ghg_2023_dl.csv",mode="wb")
+  #nir_2023<-read.csv("canada_ghg_2023_dl.csv",stringsAsFactors = F)
   
+  download.file(
+    "https://data-donnees.az.ec.gc.ca/api/file?path=/substances%2Fmonitor%2Fcanada-s-official-greenhouse-gas-inventory%2FB-Economic-Sector%2FEN_GHG_Econ_Can_Prov_Terr.csv",
+    destfile = "canada_ghg_2023_dl2.csv",mode="wb")
+  nir_full<-read.csv("canada_ghg_2023_dl2.csv",stringsAsFactors = F)
     main_sectors<-c(
     "Oil and Gas",        
     "Electricity",                                         
@@ -51,8 +55,8 @@ get_new_nir<-function() {
     "Light Manufacturing",
     "Construction",
     "Forest Resources")
-  
-  new_nir<-nir_2023 %>% 
+
+    nir_full<-nir_full %>% 
     #rename(Sector=Category,Sub.sector=Sub.category,Sub.sub.sector=Sub.sub.category)%>%
     mutate(Prov=as.factor(Region),
            Prov=fct_recode(Prov,"AB"="Alberta",
@@ -72,8 +76,17 @@ get_new_nir<-function() {
            Prov=fct_collapse(Prov,
                              "TERR" = c("NT", "NU","YT","NT & NU"),
                              "ATL" = c("NL", "NB","NS","PE")),
-           #need to collapse new subsector structure
-           sector=case_when(
+           Prov=fct_relevel(Prov,c("Canada" ,"BC","AB" ,"SK","MB", "ON",     "QC" ,  "ATL" ,   "TERR"  )),
+           CO2eq=as.numeric(CO2eq)
+           )%>%clean_names()
+           
+           save(nir_full,file="nir_full.RData")
+           
+           
+           
+           new_nir<-nir_full %>% mutate(
+             #need to collapse new subsector structure
+            sector=case_when(
              (Sector!="")&(Sub.sector=="")&(Sub.sub.sector=="") ~ Sector, #both subs are blank
              (Sub.sector!="")&(Sub.sub.sector=="") ~ Sub.sector, #just sub.sub is blank
              (Sub.sub.sector!="") ~ Sub.sub.sector, #sub.sub exists
@@ -105,6 +118,9 @@ get_new_nir<-function() {
   
   new_nir
 }
+
+
+
 
 #here, we want to use the new inventory data
 #new_nir<-get_new_nir()
@@ -2705,3 +2721,48 @@ ggsave("made_up.png",width=13,height = 7,bg="white",dpi=100)
 #        NULL
 #   )
 # ggsave("images/inventory_aviation_sector.png",dpi = 300,width=14, height=7)
+
+
+#sector graphs
+
+#grab the full data w sectors
+load("NIR_full.RDATA")
+
+test<-nir_full%>%filter(source=="Oil and Gas", prov =="AB")
+
+test<-nir_full%>%filter(source=="Agriculture", prov =="Canada",total!="y")
+
+## transform all columns
+ggplot(nir_full%>%filter(source=="Agriculture", prov !="Canada",total!="y")%>%
+         group_by(year,sector,sub_sector,sub_sub_sector,prov)%>%
+         summarize(co2eq=sum(co2eq,na.rm = T))
+         )+
+  geom_area(aes(year,co2eq,group=sector,fill=sector),color="black",position = "stack",size=0.1)+
+  #geom_line(aes(year,net_30_2005,colour=str_wrap("30% below 2005 provincial GHGs",width = 20)),linetype=1,size=1.05)+
+  facet_wrap( ~ prov,nrow = 1)+
+  scale_x_continuous(breaks=pretty_breaks())+
+  #scale_color_viridis("",discrete=TRUE,guide_legend(NULL),option="E")+
+  #scale_fill_viridis("",discrete=TRUE,option="E")+
+  scale_fill_manual("",values=colors_ua10())+
+  #scale_fill_manual("",values = my_palette,guide = "legend")+
+  #scale_fill_grey("",guide = "legend",start = 0.9,end=0.05)+
+  scale_colour_manual("",values="black",guide = "legend")+
+  geom_hline(aes(yintercept=0))+
+  #guides(fill=guide_legend(nrow =1,byrow=FALSE),color=guide_legend(nrow =1,byrow=FALSE))+
+  theme_tufte()+theme(
+    legend.position = "right",
+    legend.margin=margin(c(.05,0,.05,0),unit="cm"),
+    legend.text = element_text(colour="black", size = 12),
+    plot.caption = element_text(size = 10, face = "italic",hjust=0),
+    plot.title = element_text(size=16,face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    #panel.grid.minor = element_blank(),
+    text = element_text(size = 20,face = "bold"),
+    axis.text.y = element_text(size = 12,face = "bold", colour="black"),
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(size = 10, colour = "black", angle = 90,hjust=0.5,vjust=0.5),
+    strip.text.x = element_text(size = 12, colour = "black", angle = 0),
+    axis.title.y = element_text(size = 14,face = "bold", colour="black"),
+  )+
+  labs(x=NULL,y=expression('Annual Emissions  '*'(MtCO'[2]*'e)'))
+ggsave("images/inventory_agri.png",dpi = 300,width=18, height=7,bg="white")
