@@ -1,7 +1,7 @@
 Canada has a long road ahead, especially with the new Glasgow target to reduce emissions to 40-45% below 2005 levels by 2030.
 
-<a href="images/emissions_and_targets_simple.png" target="_blank">
-  <img border="0" align="center"  src="images/emissions_and_targets_simple.png"/>
+<a href="images/emissions_and_targets_both.png" target="_blank">
+  <img border="0" align="center"  src="images/emissions_and_targets_both.png"/>
 </a>
 
 
