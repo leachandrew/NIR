@@ -228,7 +228,7 @@ ggplot(df1)+
        title="2004-2021 Emissions from Large Emitters and the Rest of the Economy",
        subtitle=paste("Large, point source emitters (facilities with annual emissions above 10kt/yr CO2e in any year) represented ",round(natl_share*100,1),"% of Canada's emissions in ",max(df1$ref_year),sep=""),
        caption="Source: Environment Canada data, graph by @andrew_leach")
-ggsave("prov_ghgs_stack.png",bg="white",width=16,height=9,dpi=300)
+ggsave("images/prov_ghgs_stack.png",bg="white",width=16,height=9,dpi=300)
 
 
 
@@ -266,7 +266,7 @@ ggplot(#test<-
        title="2004-2021 Change in Emissions from Large Emitters and the Rest of the Economy",
        subtitle=paste("Large emitters are defined as facilities with annual emissions above 10kt/yr CO2e in any year, and they represented ",round(natl_share*100,1),"% of Canada's emissions in ",max(df1$ref_year),sep=""),
        caption="Source: Environment Canada data, graph by @andrew_leach")
-ggsave("lfe_ghgs_change.png",bg="white",width=16,height=9,dpi=300)
+ggsave("images/lfe_ghgs_change.png",bg="white",width=16,height=9,dpi=300)
 
 
 

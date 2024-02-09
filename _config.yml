@@ -11,11 +11,12 @@ remote_theme: daattali/beautiful-jekyll
 
 
 navbar-links:
-  National Emissions and Target: "canada"
+  National Targets: "canada"
   Provinces: "provinces"
   Economic Sectors: "econ_sectors"
   Projections: "projections"
   Alberta: "alberta"
+  Industrial Emissions: "industry"
   Github: "https://github.com/leachandrew/NIR"
 
 # --- Logo --- #
