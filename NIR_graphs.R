@@ -940,7 +940,7 @@ ggsave("images/inventory_prov_pc.png",dpi = 220,width=14, height=7,bg="white")
 pc_prov_plot+geom_area(data = proj_data %>% filter(scenario%in% c(inventory,project_case) & prov !="Canada" & prov!= "TERR")%>%
                       filter((scenario==project_case & year>nir_year)|(scenario==inventory & year<=nir_year)),
                     aes(year,emissions/pop*10^6,fill=sector),color="black",position = "stack",size=0.1,alpha=.4)+
-  proj_labs(subtitle=paste(proj_subtitle," emissions per capita based on Statisitics Canada population estimates", sep=""),
+  proj_labs(subtitle=paste(proj_subtitle," per capita (StatCan population estimates)", sep=""),
             title="Canadian GHG Emissions Per Capita by Province",
             NULL)+
   labs(y=expression('Annual Emissions  '*'(tCO'[2]*'e per capita)'),)+

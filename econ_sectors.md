@@ -24,7 +24,6 @@ And, the oil and gas sector, which gets the most attention for its emissions, is
 </a>
 
 
-
 With the federal government looking to cap oil and gas emissions, projections for that sector specifically might also be of interest:
 
 <a href="images/oil_proj.png" target="_blank">
