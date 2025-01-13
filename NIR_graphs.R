@@ -1380,9 +1380,6 @@ targets_graph+
   geom_line(data=filter(cdn_data,scenario %in% c("2016 Reference Case")),aes(year,emissions),color=palette[1],lty="22",size=1.45)+
   annotate("text",x=2030.2,y=815,label="2016 Reference Case",color=palette[1],fontface="bold",hjust=0,vjust=0.5)+
   
-  
-  
-  
   NULL
 ggsave("images/emissions_and_targets_both.png",bg="white",dpi=300,width=15,height=7)
 
