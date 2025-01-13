@@ -11,17 +11,13 @@ Adding projections from ECCC shows where we expect emissions trends to take us:
 </a>
 
 
-And, the oil and gas sector, which gets the most attention for its emissions, is isolated in the image below:
-
-
-<a href="images/oil_gas.png" target="_blank">
-  <img border="0" align="center"  src="images/oil_gas.png"/>
-</a>
+And, the oil and gas sector, which gets the most attention for its emissions, is isolated in the images below:
 
 
 <a href="images/nir_oil.png" target="_blank">
   <img border="0" align="center"  src="images/nir_oil.png"/>
 </a>
+
 
 <a href="images/nir_oil_prov.png" target="_blank">
   <img border="0" align="center"  src="images/nir_oil_prov.png"/>
@@ -29,12 +25,9 @@ And, the oil and gas sector, which gets the most attention for its emissions, is
 
 
 
-With the federal government looking to cap oil and gas emissions, a couple of other graphics might be interesting to people, so I've added them below:
+With the federal government looking to cap oil and gas emissions, projections for that sector specifically might also be of interest:
 
-<a href="images/oil_gas_proj.png" target="_blank">
+<a href="images/oil_proj.png" target="_blank">
   <img border="0" align="center"  src="images/oil_gas_proj.png"/>
 </a>
 
-<a href="images/oil_gas_proj_prov.png" target="_blank">
-  <img border="0" align="center"  src="images/oil_gas_proj_prov.png"/>
-</a>
