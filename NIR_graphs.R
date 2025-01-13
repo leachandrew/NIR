@@ -863,8 +863,8 @@ prov_plot+
 ggsave(filename = "images/inventory_prov_bw.png", dpi = 300,width=14, height=7,bg="white")
 
 prov_plot+
-  proj_labs()
-  ggsave("images/inventory_prov.png",dpi = 220,width=14, height=7,bg="white")
+  proj_labs(subtitle = inv_subtitle,title="Canadian GHG Emissions by Province and Sector")
+  ggsave("images/inventory_prov.png",dpi = 300,width=14, height=7,bg="white")
 
 
 prov_plot+
