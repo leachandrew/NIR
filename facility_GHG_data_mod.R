@@ -2,7 +2,7 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 library(cansim)
-#download.file("http://data.ec.gc.ca/data/substances/monitor/greenhouse-gas-reporting-program-ghgrp-facility-greenhouse-gas-ghg-data/PDGES-GHGRP-GHGEmissionsGES-2004-Present.xlsx", destfile="LFE_2004_present.xlsx", mode = "wb")
+#download.file("https://data-donnees.az.ec.gc.ca/api/file?path=%2Fsubstances%2Fmonitor%2Fgreenhouse-gas-reporting-program-ghgrp-facility-greenhouse-gas-ghg-data%2FPDGES-GHGRP-GHGEmissionsGES-2004-Present.xlsx", destfile="LFE_2004_present.xlsx", mode = "wb")
 
 
 #load plant data
@@ -23,9 +23,12 @@ plant_data<-plant_data%>%clean_names()%>%
 naics3_data <- read_excel("lfe_naics.xlsx", sheet = "NAICS3")%>%clean_names()
 naics4_data <- read_excel("lfe_naics.xlsx", sheet = "NAICS4")%>%clean_names()
 
+
+#test<-plant_data %>% filter(grepl("Fi",facility_name))
+
 load("data/prov_ghgs.Rdata")
 prov_ghgs$Sector<-NULL
-prov_ghgs<-prov_ghgs %>% group_by(Year) %>% mutate(national_ghgs=sum(GHGs))
+prov_ghgs<-prov_ghgs %>% group_by(year) %>% mutate(national_ghgs=sum(GHGs))
 
 plant_data<-merge(plant_data,naics3_data,by="naics3")
 plant_data<-merge(plant_data,naics4_data,by="naics4")
@@ -63,7 +66,7 @@ plant_data$prov <- fct_collapse(plant_data$code,
                                 "TERR" = c("NT", "NU","YT"),
                                 "ATL" = c("NL", "NB","NS","PE"))
 
-plant_data<-merge(plant_data,prov_ghgs,by.x=c("prov","reference_year"),by.y = c("Prov","Year"),all.x=TRUE)
+plant_data<-merge(plant_data,prov_ghgs,by.x=c("prov","reference_year"),by.y = c("prov","year"),all.x=TRUE)
 
 #AB_2017<-plant_data %>% filter(Prov=="AB", Reference.Year==2017)
 
@@ -71,7 +74,7 @@ plant_data<-merge(plant_data,prov_ghgs,by.x=c("prov","reference_year"),by.y = c(
 #get population data
 
 #Cansim 17-10-0005-01
-pop_data<-get_cansim("1710000501")%>% filter(Sex=="Both sexes",`Age group`=="All ages")%>%
+pop_data<-get_cansim("1710000501")%>% filter(Gender=="Total - gender",`Age group`=="All ages")%>%
   mutate(Prov=as.factor(GEO),
          Code=fct_recode(Prov,"AB"="Alberta",
                          "BC"="British Columbia",
@@ -99,6 +102,8 @@ pop_data<-get_cansim("1710000501")%>% filter(Sex=="Both sexes",`Age group`=="All
 #prov_pop<-melt(prov_pop,id=c("Prov_name","Code"), value.name = "Prov_Pop",variable.name = "Year")
 #prov_pop$Prov_Pop<-as.numeric(prov_pop$Prov_Pop)
 #save(prov_pop,file = "prov_pop.Rdata")
+
+
 
 plant_data<-merge(plant_data,pop_data,by.x=c("prov","reference_year"),by.y = c("Code","Year"),all.x=TRUE)
 
@@ -157,12 +162,12 @@ df2<-df1 %>% ungroup()%>% pivot_wider(names_from=sector,values_from=prov_sector_
          sector=fct_relevel(sector,"Small Emitters",after = Inf),
          prov_sector_ghgs = replace_na(prov_sector_ghgs, 0))
   
-my_palette<-c("#313695",brewer.pal(9, "Set1"))
+my_palette<-c("#313695",colors_tableau10())
 
 lfe_proc<-df2
 #save(lfe_proc,file = "lfe_proc.Rdata")
 
-
+library(scales)
 #load(file = "lfe_proc.Rdata")
 #df1<-lfe_proc
 df1<-df2 %>% mutate(label=paste(ref_year," industrial emissions of ",round(prov_lfe_ghg,0),"Mt, or ",round(prov_lfe_ghg/prov_ghgs*100,0),"% of provincial emissions"," and ",round(prov_lfe_ghg/natl_lfe*100,0),"% of national industrial emissions",sep=""))
@@ -440,7 +445,7 @@ df1 <- plant_data %>% #filter(Facility.Name %in% lfe_2017_all$Facility.Name) %>%
 #Keep top 6
 
 
-df1 <- df1 %>% group_by(Prov,Ref_Year) %>% mutate(lfe_ghg=sum(ghg),other_ghg=prov_ghgs-lfe_ghg) %>% ungroup
+df1 <- df1 %>% group_by(prov,ref_year) %>% mutate(lfe_ghg=sum(ghg),other_ghg=prov_ghgs-lfe_ghg) %>% ungroup
 
 
 ggplot(df1)+
@@ -448,7 +453,7 @@ ggplot(df1)+
   geom_line(aes(Ref_Year,lfe_ghg),colour="blue")+
   geom_line(aes(Ref_Year,other_ghg),colour="green")+
   geom_line(aes(Ref_Year,(lfe_ghg+other_ghg)),colour="orange")+
-  facet_grid( ~ Prov)
+  facet_grid( ~ prov)
 
 
 df2<-dcast(df1,Prov + Ref_Year+prov_ghgs+lfe_ghg+other_ghg+prov_pop ~ Sector,value.var="ghg")
@@ -471,7 +476,7 @@ df1$Sector<-fct_relevel(df1$Sector, "Small Emitters", after = Inf)
 
 #df1$Sector<-factor(df1$Sector, levels=rev(unique(df1$Sector)))
 
-my_palette<-c("#313695",brewer.pal(9, "Set1"))
+my_palette<-c("#313695",colors_tableau10())
 
 lfe_proc<-df1
 save(lfe_proc,file = "lfe_proc.Rdata")
