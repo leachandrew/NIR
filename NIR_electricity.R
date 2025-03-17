@@ -17,23 +17,27 @@ options(scipen=999)
 
 get_data<-function() {
   file_path<-"nir_electricity.xlsx"
-  #download.file("https://data.ec.gc.ca/data/substances/monitor/canada-s-official-greenhouse-gas-inventory/C-Tables-Electricity-Canada-Provinces-Territories/EN_Electricity_Can_Prov_Terr.xlsx",file_path,mode="wb")
+  #download.file("https://data-donnees.az.ec.gc.ca/api/file?path=%2Fsubstances%2Fmonitor%2Fcanada-s-official-greenhouse-gas-inventory%2FC-Tables-Electricity-Canada-Provinces-Territories%2FEN_Annex13_Electricity_Intensity.xlsx",file_path,mode="wb")
   #get the listing of sheets
-  sheet_names<-excel_sheets(file_path)
-  index_val<-1
+  # Get sheet names from the Excel file
+  sheet_names <- excel_sheets(file_path)
+  # Select sheets from the 3rd sheet to the second-last sheet
+  sheet_names <- sheet_names[3:(length(sheet_names) - 1)]  
   prov_list<-list()
+  index_val<-1
   for(target_sheet in sheet_names){
-  #target_sheet<-sheet_names[1]
+  #target_sheet<-sheet_names[3]
+  print(target_sheet)
   prov<-read_excel(file_path,target_sheet,range = "B1",col_names = FALSE)%>%
     rename(province=1)%>%
     mutate(province=gsub("Table A11-13: Electricity Generation and GHG Emission Details for the Nunavut","Nunavut",province),
            province=gsub("Electricity Generation and GHG Emission Details for ","",province))%>%
     as.character()
   print(prov)
-  col_names<-read_excel(file_path,target_sheet,range = "B3:U3",col_names = FALSE)
+  col_names<-read_excel(file_path,target_sheet,range = "B3:V3",col_names = FALSE)
   col_names[1]<-"fuel"
   col_names<-gsub("a","",col_names)
-  elec_data<-read_excel(file_path,target_sheet,range = "B6:U11",col_names = FALSE,
+  elec_data<-read_excel(file_path,target_sheet,range = "B6:V11",col_names = FALSE,
                         na = c("N/A", "n/a","x","**"))
   names(elec_data)<-as.character(col_names)
   
@@ -51,7 +55,7 @@ get_data<-function() {
     pivot_longer(-c(fuel,prov),names_to = "year",values_to = "ghg")%>%
     mutate(year=as.numeric(year))
   
-  gen_data<-read_excel(file_path,target_sheet,range = "B15:U23",col_names = FALSE,
+  gen_data<-read_excel(file_path,target_sheet,range = "B15:V23",col_names = FALSE,
                        na = c("N/A", "n/a","x","**"))
   names(gen_data)<-as.character(col_names)
   gen_data <-gen_data %>% 
@@ -92,7 +96,7 @@ get_data<-function() {
   prov_data
 }
 
-#all_provs_data<-get_data()
+all_provs_data<-get_data()
 #save(all_provs_data,file = "prov_elec.Rdata")
 
 load(file = "prov_elec.Rdata")
@@ -142,14 +146,15 @@ scale_fac<-150
 
 library(ggpattern)
 elec_provs<-
-ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada"),!fuel%in%c("Combustion","Overall Total","Other Generation"))%>%
+ggplot(prov_data %>% filter(year==2022,!prov%in%c("Canada"),!fuel%in%c("Combustion","Overall Total","Other Generation"))%>%
          mutate(prov=factor(prov,levels=c("Canada" ,"BC","AB" ,"SK","MB", "ON","QC","NL","NB","NS","PE","TERR"))))+
   #geom_col(aes(prov,ghg,group=fuel,fill=fuel),position = "stack")+
-  geom_col_pattern(aes(prov,gen/1000,group=fuel,fill=fuel,pattern=fuel),position = "stack",colour="black",size=.2,width = .8,pattern_spacing = .02)+
+  
+  geom_col(aes(prov,gen/1000,group=fuel,fill=fuel),position = "stack",colour="black",size=.2,width = .8)+
   #geom_line(data=prov_data %>% filter(year==2020,prov!="Canada",fuel=="Overall Total"),
   #          aes(prov,ghg/1000*5,group=year,color="GHG Emissions (right axis)"),size=1.25)+
-  geom_point(data=ci_data %>% filter(year==2021,!prov%in%c("Canada"),),
-             aes(prov,ci*scale_fac,group=year,color="2021 Emissions Intensity (right axis)"),size=3,
+  geom_point(data=ci_data %>% filter(year==2022,!prov%in%c("Canada"),),
+             aes(prov,ci*scale_fac,group=year,color="2022 Emissions Intensity (right axis)"),size=3,
              shape=21, stroke=2, fill="white")+
   geom_point(data=ci_data %>% filter(year==1990,!prov%in%c("Canada")),
              aes(prov,ci*scale_fac,group=year,color="1990 Emissions Intensity (right axis)"),size=3,
@@ -164,8 +169,8 @@ ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada"),!fuel%in%c("Combusti
     sec.axis = sec_axis( trans=~./scale_fac, name=expression('Emissions Intensity  '*'(tCO'[2]*'e/MWh)'))
   )+
   theme_tufte()+
-  scale_pattern_manual("",values=c("Hydro"="none","Non-hydro Renewables"= "none", "Natural Gas"="none", "Coal"="none",
-                                   "Other Fuel"="stripe","Nuclear"="crosshatch"))+
+  #scale_pattern_manual("",values=c("Hydro"="none","Non-hydro Renewables"= "none", "Natural Gas"="none", "Coal"="none",
+  #                                 "Other Fuel"="stripe","Nuclear"="crosshatch"))+
   
   theme(
     legend.position = "bottom",
@@ -190,6 +195,7 @@ ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada"),!fuel%in%c("Combusti
        #caption=str_wrap("Source: Environment and Climate Change Canada 2022 National Inventory. Graph by @andrew_leach.",width = 180),
        NULL
   )+
+  
   scale_fill_manual("",values=c("white","grey20","grey80","black","grey60","grey90"))+
   scale_colour_manual("",values=c("grey65","black"),guide = "legend")+
   guides(color=guide_legend(nrow =3,byrow=FALSE,label.theme=element_text(colour='grey30')),
@@ -206,7 +212,7 @@ ggplot(prov_data %>% filter(year==2021,!prov%in%c("Canada"),!fuel%in%c("Combusti
 elec_provs+
   scale_fill_manual("",values=c(colors_ua10()[4],colors_ua10()[1],viridis(10,option="cividis",direction = 1,alpha = .5)[9],"grey20","grey40",viridis(10,option="cividis",direction = 1,alpha = .5)[7]))+
   labs(
-    caption="Data via Environment and Climate Change Canada 2023 National Inventory Report, graph by @andrew_leach.",
+    caption="Data via Environment and Climate Change Canada 2024 National Inventory Report, graph by @andrew_leach.",
     NULL
   )
 ggsave("images/all_prov_elec_col_caption.png",width = 10,height=7,dpi=300,bg="white")

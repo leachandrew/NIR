@@ -22,3 +22,10 @@ and the same data augmented with current reference case projections.
 <a href="images/inventory_proj_pc.png" target="_blank">
   <img border="0" align="center"  src="images/inventory_proj_pc.png"/>
 </a>
+
+
+Electricity is also a major differentiator between provinces in Canada:
+
+<a href="images/all_prov_elec_col_caption.png" target="_blank">
+  <img border="0" align="center"  src="images/all_prov_elec_col_caption.png"/>
+</a>
