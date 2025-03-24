@@ -373,13 +373,13 @@ theme_nir<-function(){
 }
   
 
-labs_nir<-function(graph_title="GHG Emissions Data",graph_years="1990-2022"){
-  labs(caption="Source: Environment Canada National Inventory Report (2024), graph by @andrew_leach",
+labs_nir<-function(graph_title="GHG Emissions Data",graph_years="1990-2023"){
+  labs(caption="Source: Environment Canada National Inventory Report (2025), graph by @andrew_leach",
        title=paste(graph_title,graph_years,sep=", "))
 
 }
 
-plot_palette<-wes_palette("BottleRocket2", 8, type = "continuous")
+plot_palette<-rev(colorblind_pal()(8))
 
 
 ggplot(filter(NIR_natl,sector!="National Inventory Total"))+
