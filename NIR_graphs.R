@@ -1360,7 +1360,7 @@ palette<-viridis(8,option="magma",direction = -1,begin = 0.05,end = .85)
 
 targets_graph+ 
   labs(title="Canada's GHG Emissions, Projections and Future Targets",
-  subtitle="Source: Environment and Climate Change Canada National Emissions Inventory Report (2024) and Projections (2016-2023). Graph by Andrew Leach.")+
+  subtitle="Source: Environment and Climate Change Canada National Emissions Inventory Report (2025) and Projections (2016-2024). Graph by Andrew Leach.")+
   annotate("text",x=2040.2,y=588.6,label="2024 ECCC Reference Case",color="black",fontface="bold",hjust=0)+
   
   geom_line(data=filter(cdn_data,scenario %in% c("2024 Additional Measures Scenario")),aes(year,emissions),color="darkgreen",lty="22",size=1.45)+

@@ -2,11 +2,9 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 
-#download.file("http://data.ec.gc.ca/data/substances/monitor/greenhouse-gas-reporting-program-ghgrp-facility-greenhouse-gas-ghg-data/PDGES-GHGRP-GHGEmissionsGES-2004-Present.xlsx", destfile="LFE_2004_present.xlsx", mode = "wb")
+download.file("https://data-donnees.az.ec.gc.ca/api/file?path=%2Fsubstances%2Fmonitor%2Fgreenhouse-gas-reporting-program-ghgrp-facility-greenhouse-gas-ghg-data%2FPDGES-GHGRP-GHGEmissionsGES-2004-Present.xlsx",destfile = "fed_ghgs_new.xlsx",mode="wb")
 
-
-#load plant data
-plant_data <- read_excel("LFE_2004_Present.xlsx", sheet = 3)
+plant_data <- read_excel("fed_ghgs_new.xlsx",sheet = "GHG Emissions GES 2004-2023")
 
 names(plant_data) <- do.call(rbind,str_split(names(plant_data),"./."))[,1]
 names(plant_data)[grepl("\\(",names(plant_data))& !grepl("\\)",names(plant_data))]<-
@@ -240,7 +238,48 @@ ggplot(df1)+
        caption="Source: Environment Canada data, graph by @andrew_leach")
 ggsave("prov_ghgs_stack.png",bg="white",width=16,height=9,dpi=300)
 
-df1<-df1 %>% mutate(pc_label=paste("2017 large emitter GHGs of ",round(lfe_ghg,0),"Mt, or ",round(lfe_ghg/prov_ghgs*100,0),"% of provincial emissions. Population of ",round(prov_pop/10^6,2),
+options(scipen = 988)
+
+
+test<-
+plant_data %>% 
+  group_by(ref_year)%>%
+  arrange(-total_emissions_tonnes_co2e)%>%
+    mutate(cda_rank = row_number())%>%
+  filter(prov=="SK")%>%
+  group_by(facility_name)%>%
+    mutate(facility_mean=mean(total_emissions_tonnes_co2e,na.rm=T))%>%
+  ungroup()%>%
+  arrange(-ref_year,-facility_mean)%>%
+  select(ref_year,cda_rank,facility_name,total_emissions_tonnes_co2e,facility_mean,co2_tonnes,everything())%>%
+  mutate(facility_name=fct_other(facility_name,keep=unique(facility_name[1:10])))%>%
+  group_by(ref_year,facility_name)%>%
+  summarize(ghgs=sum(total_emissions_tonnes_co2e,na.rm=T)/10^6,cda_rank=min(cda_rank))%>%
+  arrange(-ref_year,cda_rank)
+  
+  
+  ggplot()+
+  geom_area(aes(ref_year,GHGs, group=facility_name,fill=facility_name))
+
+
+  
+  test<-
+    plant_data %>% filter(ref_year==2023)%>%
+    arrange(-total_emissions_tonnes_co2e*(ref_year==2023))%>%
+    mutate(cda_rank = row_number())%>%
+    arrange(cda_rank)%>%
+    mutate(facility_name=fct_other(facility_name,keep=unique(facility_name[1:10])))%>%
+        select(ref_year,cda_rank,facility_name,prov,total_emissions_tonnes_co2e,everything())%>%
+    group_by(ref_year,cda_rank,facility_name,prov)%>%
+    summarize(ghgs=sum(total_emissions_tonnes_co2e,na.rm=T)/10^6,cda_rank=min(cda_rank))%>%
+    arrange(-ref_year,cda_rank)
+  
+  
+  ggplot()+
+    geom_area(aes(ref_year,GHGs, group=facility_name,fill=facility_name))
+  
+  
+  df1<-df1 %>% mutate(pc_label=paste("2017 large emitter GHGs of ",round(lfe_ghg,0),"Mt, or ",round(lfe_ghg/prov_ghgs*100,0),"% of provincial emissions. Population of ",round(prov_pop/10^6,2),
                                    " million",sep=""))
 
 
