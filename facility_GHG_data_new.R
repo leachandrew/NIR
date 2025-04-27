@@ -1,7 +1,9 @@
 library(tidyverse)
 library(readxl)
 library(RColorBrewer)
-
+library(janitor)
+library(cansim)
+library
 download.file("https://data-donnees.az.ec.gc.ca/api/file?path=%2Fsubstances%2Fmonitor%2Fgreenhouse-gas-reporting-program-ghgrp-facility-greenhouse-gas-ghg-data%2FPDGES-GHGRP-GHGEmissionsGES-2004-Present.xlsx",destfile = "fed_ghgs_new.xlsx",mode="wb")
 
 plant_data <- read_excel("fed_ghgs_new.xlsx",sheet = "GHG Emissions GES 2004-2023")
@@ -16,14 +18,18 @@ names(plant_data)[grepl("^Facility.NAICS.Code$",names(plant_data))]<-"NAICS"
 plant_data<-plant_data%>%clean_names()%>%
   mutate(naics3=substr(naics,1,3),
          naics4=substr(naics,1,4),
-         total_co2e=as.numeric(total_emissions_tonnes_co2e))
+         total_co2e=as.numeric(total_emissions_tonnes_co2e))%>%
+  group_by(ghgrp_id_no)%>%
+  fill(facility_province_or_territory)#fill missing prov
+
+
 
 naics3_data <- read_excel("lfe_naics.xlsx", sheet = "NAICS3")%>%clean_names()
 naics4_data <- read_excel("lfe_naics.xlsx", sheet = "NAICS4")%>%clean_names()
 
 load("data/prov_ghgs.Rdata")
 prov_ghgs$Sector<-NULL
-prov_ghgs<-prov_ghgs %>% group_by(year) %>% mutate(GHGs=GHGs/1000,national_ghgs=sum(GHGs))
+prov_ghgs<-prov_ghgs %>% group_by(year) %>% mutate(GHGs=GHGs,national_ghgs=sum(GHGs))
 
 plant_data<-merge(plant_data,naics3_data,by="naics3")
 plant_data<-merge(plant_data,naics4_data,by="naics4")
@@ -69,7 +75,7 @@ plant_data<-merge(plant_data,prov_ghgs,by.x=c("prov","reference_year"),by.y = c(
 #get population data
 
 #Cansim 17-10-0005-01
-pop_data<-get_cansim("1710000501")%>% filter(Gender=="Gender - total",`Age group`=="All ages")%>%
+pop_data<-get_cansim("1710000501")%>% filter(Gender=="Total - gender",`Age group`=="All ages")%>%
   mutate(Prov=as.factor(GEO),
          Code=fct_recode(Prov,"AB"="Alberta",
                          "BC"="British Columbia",
@@ -91,7 +97,7 @@ pop_data<-get_cansim("1710000501")%>% filter(Gender=="Gender - total",`Age group
          Code=fct_collapse(Code,
                            "TERR" = c("NT", "NU","YT","NT & NU"),
                            "ATL" = c("NL", "NB","NS","PE")))%>%
-  select(Year,Prov_name,Code,Prov_pop)%>% group_by(Year,Code)%>%summarize(Prov_pop=sum(Prov_pop))
+  select(Year,Prov_name,Code,Prov_pop)%>% group_by(Year,Code)%>%summarize(Prov_pop=sum(Prov_pop))%>%ungroup()
 
 #prov_pop <- read.xlsx(xlsxFile = "LFE-GHG-2004-Present.xlsx", sheet = 8, startRow = 1,skipEmptyRows = TRUE,detectDates = TRUE)
 #prov_pop<-melt(prov_pop,id=c("Prov_name","Code"), value.name = "Prov_Pop",variable.name = "Year")
@@ -191,8 +197,8 @@ ggplot(df1)+
   geom_area(aes(ref_year,GHGs,fill=Sector),colour="black",position = "stack",size=.1)+
   #geom_line(aes(Ref_Year,`Provincial Emissions`),size=2)+
   facet_grid( ~ prov)+
-  geom_label(data=df1 %>% filter(ref_year==2022,Sector=="Transportation"),
-                   aes(x=2004+(2022-2004)/2,
+  geom_label(data=df1 %>% filter(ref_year==2023,Sector=="Transportation"),
+                   aes(x=2004+(2023-2004)/2,
                        y=300,label=str_wrap(label, width = 20)),
                    fontface = 'bold',
                    size = 2.8,
@@ -233,7 +239,7 @@ ggplot(df1)+
     strip.text.x = element_text(size = 14, colour = "black", angle = 0)
     )+
   labs(x=NULL,y=expression('Annual Emissions '*'(MtCO'[2]*'e)'),
-       title="2004-2022 Emissions from Large Emitters and the Rest of the Economy",
+       title="2004-2023 Emissions from Large Emitters and the Rest of the Economy",
        subtitle=paste("Large, point source emitters (facilities with annual emissions above 10kt/yr CO2e in any year) represented ",round(natl_total,0),"Mt (",round(natl_share*100,1),"%) of Canada's emissions in ",max(df1$ref_year),sep=""),
        caption="Source: Environment Canada data, graph by @andrew_leach")
 ggsave("prov_ghgs_stack.png",bg="white",width=16,height=9,dpi=300)
